@@ -1,5 +1,5 @@
 <div>
-  {{#if !currentSubmissions || !currentPrompts}}
+  {{#if !currentProject || !currentSubmissions || !currentPrompts}}
     Loading submissions.
   {{else}}
     <label><input type="radio" bind:group="organize" value='prompt' checked>Group by prompt</label>
@@ -149,7 +149,7 @@
       };
     },
     computed: {
-      projectName: currentProject => currentProject.fields.name,
+      projectName: currentProject => currentProject ? currentProject.fields.name: '',
       callers: function callersFunc(currentSubmissions) {
         if (!currentSubmissions) return null;
         return Array.from(new Set(currentSubmissions.map(sub => sub.fields.caller)));

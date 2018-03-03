@@ -24,6 +24,7 @@ app.post('/api/projects', express.json(), newProject);
 app.post('/api/prompts', upload.single('promptAudio'), newPrompt);
 app.post('/api/call/:index', express.urlencoded({ extended: true }), handleCall);
 app.get('/api/temp', tempServe);
+app.get('/*', (req, res) => { res.sendFile(`${__dirname}/public/index.html`); });
 
 app.listen(process.env.PORT || 3000, () => {
   console.log('👨‍🏫🎙 I\'m listening.');

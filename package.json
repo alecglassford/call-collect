@@ -55,9 +55,11 @@
     "rollup-plugin-buble": "^0.19.2",
     "rollup-plugin-commonjs": "^8.3.0",
     "rollup-plugin-node-resolve": "^3.0.3",
+    "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-svelte": "^4.0.0",
     "rollup-plugin-uglify": "^3.0.0",
     "svelte": "^1.55.1",
+    "svelte-routing": "^0.2.0",
     "svelte-transitions": "^1.1.1"
   }
 }

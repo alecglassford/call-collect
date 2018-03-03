@@ -1,3 +1,4 @@
+{{#if currentProject}}
 <div id="project-info">
   <h2>{{name}}</h2>
   <h3>{{humanPhone(currentProject.fields.phone)}}</h3>
@@ -23,6 +24,7 @@
     <p>This project has received {{currentSubmissions.length}} submissions.</p>
   {{/if}}
 </div>
+{{/if}}
 
 <style>
   #project-info {
@@ -65,7 +67,7 @@
 
   export default {
     computed: {
-      name: currentProject => currentProject.fields.name,
+      name: currentProject => currentProject ? currentProject.fields.name : '',
     },
     helpers: {
       audioUrl: prompt => prompt.fields.audio[0].url,

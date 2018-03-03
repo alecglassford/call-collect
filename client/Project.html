@@ -1,12 +1,6 @@
 <div>
-  {{#if currentProject === 'new'}}
-    <NewProject/>
-  {{elseif currentProject}}
-    <ProjectInfo :currentProject :currentPrompts :currentSubmissions/>
-    <Submissions :currentProject :currentPrompts :currentSubmissions/>
-  {{else}}
-    <h2>⬅️ Select a project or create a new one.</h2>
-  {{/if}}
+  <ProjectInfo :currentProject :currentPrompts :currentSubmissions/>
+  <Submissions :currentProject :currentPrompts :currentSubmissions/>
 </div>
 
 <style>
@@ -20,12 +14,11 @@
 </style>
 
 <script>
-  import NewProject from './NewProject.html';
   import ProjectInfo from './ProjectInfo.html';
   import Submissions from './Submissions.html';
 
   export default {
-    components: { NewProject, ProjectInfo, Submissions },
+    components: { ProjectInfo, Submissions },
     data() {
       return {
         currentProject: null,
@@ -40,10 +33,15 @@
       },
     },
     oncreate() {
+      const match = this.get('match');
+      const projects = this.store.get('projectList');
+      const currentProject = projects
+        .find(p => p.id === match.params.slug);
+      this.set({ currentProject });
       const fetchPrompts = () => {
         this.set({ currentPrompts: null });
         const name = this.get('uriName');
-        fetch(`api/prompts/${name}`).then(res => res.json())
+        fetch(`/api/prompts/${name}`).then(res => res.json())
           .then((currentPrompts) => {
             this.set({ currentPrompts });
           });
@@ -51,7 +49,7 @@
       const fetchSubmissions = () => {
         this.set({ currentSubmissions: null });
         const name = this.get('uriName');
-        fetch(`api/submissions/${name}`).then(res => res.json())
+        fetch(`/api/submissions/${name}`).then(res => res.json())
           .then((currentSubmissions) => {
             this.set({ currentSubmissions });
           });

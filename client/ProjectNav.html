@@ -1,31 +1,28 @@
 <div>
   <h2>Your Projects</h2>
-  {{#await projectList}}
+  {{#if $projectList}}
+  {{#await $projectList}}
     <p>Waiting for project list...</p>
   {{then projects}}
       {{#if projects.length === 0}}
         <p>You don't have any projects yet.</p>
       {{else}}
         {{#each projects as project}}
-          <p class="{{currentProject && currentProject.id === project.id ? 'selected' : ''}}"
-              on:click="set({ currentProject: project })">
+          <Link to="/project/{{project.id}}" on:click="store.set({ project })">
             {{project.fields.name}}
-          </p>
+          </Link>
         {{/each}}
       {{/if}}
-      <p id="new-project"
-          class="{{currentProject === 'new' ? 'selected' : ''}}"
-          on:click="set({ currentProject: 'new' })">
-        ➕ New project
-      </p>
+      <Link id="new-project" to="/new-project">➕ New project</Link>
   {{catch err}}
     <p>Error getting project names</p>
   {{/await}}
+  {{/if}}
 </div>
 
 <style>
   div {
-    max-width: 15em;
+    margin: 0 auto;
     padding: 1em 0;
     background-color: #2E4053;
     color: #F4F6F7;
@@ -36,7 +33,8 @@
     font-family: "Source Serif Pro", Palatino, Georgia, serif;
   }
 
-  p {
+  :global(a) {
+    display: block;
     min-height: 2em;
     margin: 0;
     padding: 0.5em;
@@ -45,30 +43,23 @@
     font-family: sans-serif;
   }
 
-  p:hover {
+  :global(a:hover) {
     background-color: steelblue;
     cursor: pointer;
+  }
+
+  :global(a), :global(a:visited) {
+    color: white;
   }
 
   #new-project {
     font-weight: bolder;
   }
-
-  .selected {
-    background-color: #85929E;
-  }
-
-  .selected:hover {
-    background-color: #5499C7;
-  }
 </style>
 
 <script>
+  import Link from 'svelte-routing/Link.html';
   export default {
-    data() {
-      return {
-        projectList: fetch('/api/projects').then(res => res.json()),
-      };
-    },
+    components: { Link },
   };
 </script>

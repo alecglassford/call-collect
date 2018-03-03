@@ -1,48 +1,57 @@
-<div id="wrapper">
-  <h1>Call Collect</h1>
-  <div id="main">
-    <ProjectNav bind:currentProject />
-    <Project :currentProject/>
-  </div>
+<div id="nav">
+  <Link exact to="/"><h1>Call Collect</h1></Link>
+  {{#each breadcrumbs as [text, href]}}
+    <Link to="{{href}}">{{text}}</Link>
+  {{/each}}
+</div>
+<div id="main">
+  <Route exact path="/" component={{ProjectNav}}/>
+  <Route path="/project/:slug" component={{Project}}/>
+  <Route path="/new-project" component={{NewProject}}/>
 </div>
 
 <style>
-  @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
-  @import url('https://fonts.googleapis.com/css?family=Source+Serif+Pro');
-
-  #wrapper {
+  #nav {
+    width: 100%;
+    background-color: #85C1E9;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: flex-start;
-    margin: 0;
-    min-height: 100vh;
-    font-family: "Source Sans Pro", sans-serif;
-    font-size: 1.2em;
   }
 
   h1 {
     margin: 1em;
     font-size: 1em;
     font-family: "Source Serif Pro", serif;
+    color: white;
   }
 
-  #main {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+  :global(a), :global(a:visited) {
+    text-decoration: none;
   }
 </style>
 
 <script>
+  import Link from 'svelte-routing/Link.html';
+  import Route from 'svelte-routing/Route.html';
+
+  import NewProject from './NewProject.html';
   import ProjectNav from './ProjectNav.html';
   import Project from './Project.html';
 
   export default {
-    components: { ProjectNav, Project },
+    components: { Link, Route },
+    oncreate() {
+      fetch('/api/projects').then(res => res.json()).then((projectList) => {
+        this.store.set({ projectList });
+      });
+    },
     data() {
       return {
-        currentProject: null,
+        ProjectNav,
+        Project,
+        NewProject,
+        breadcrumbs: [],
       };
     },
   };

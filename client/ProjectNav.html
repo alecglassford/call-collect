@@ -1,6 +1,5 @@
 <div>
   <h2>Your Projects</h2>
-  {{#if $projectList}}
   {{#await $projectList}}
     <p>Waiting for project list...</p>
   {{then projects}}
@@ -8,16 +7,15 @@
         <p>You don't have any projects yet.</p>
       {{else}}
         {{#each projects as project}}
-          <Link to="/project/{{project.id}}" on:click="store.set({ project })">
+          <Link to="/project/{{project.id}}">
             {{project.fields.name}}
           </Link>
         {{/each}}
       {{/if}}
-      <Link id="new-project" to="/new-project">➕ New project</Link>
+      <Link to="/new-project"><strong>➕ New project</strong></Link>
   {{catch err}}
     <p>Error getting project names</p>
   {{/await}}
-  {{/if}}
 </div>
 
 <style>
@@ -33,7 +31,7 @@
     font-family: "Source Serif Pro", Palatino, Georgia, serif;
   }
 
-  :global(a) {
+  div :global(a) {
     display: block;
     min-height: 2em;
     margin: 0;
@@ -43,22 +41,19 @@
     font-family: sans-serif;
   }
 
-  :global(a:hover) {
+  div :global(a:hover) {
     background-color: steelblue;
-    cursor: pointer;
   }
 
-  :global(a), :global(a:visited) {
+  div :global(a), :global(a:visited) {
+    text-decoration: none;
     color: white;
-  }
-
-  #new-project {
-    font-weight: bolder;
   }
 </style>
 
 <script>
   import Link from 'svelte-routing/Link.html';
+
   export default {
     components: { Link },
   };

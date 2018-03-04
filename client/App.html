@@ -26,7 +26,7 @@
     color: white;
   }
 
-  :global(a), :global(a:visited) {
+  #nav :global(a), #nav :global(a:visited) {
     text-decoration: none;
   }
 </style>
@@ -41,11 +41,6 @@
 
   export default {
     components: { Link, Route },
-    oncreate() {
-      fetch('/api/projects').then(res => res.json()).then((projectList) => {
-        this.store.set({ projectList });
-      });
-    },
     data() {
       return {
         ProjectNav,

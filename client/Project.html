@@ -17,6 +17,33 @@
   import ProjectInfo from './ProjectInfo.html';
   import Submissions from './Submissions.html';
 
+  const fetchProject = function fetchProjectFunc() {
+    const { slug } = this.get('match').params;
+    return this.store.get('projectList').then((projects) => {
+      const currentProject = projects.find(p => p.id === slug);
+      this.set({ currentProject });
+      return currentProject;
+    });
+  };
+
+  const fetchPrompts = function fetchPromptsFunc() {
+    this.set({ currentPrompts: null });
+    const name = this.get('uriName');
+    fetch(`/api/prompts/${name}`).then(res => res.json())
+      .then((currentPrompts) => {
+        this.set({ currentPrompts });
+      });
+  };
+
+  const fetchSubmissions = function fetchSubmissionsFunc() {
+    this.set({ currentSubmissions: null });
+    const name = this.get('uriName');
+    fetch(`/api/submissions/${name}`).then(res => res.json())
+      .then((currentSubmissions) => {
+        this.set({ currentSubmissions });
+      });
+  };
+
   export default {
     components: { ProjectInfo, Submissions },
     data() {
@@ -33,32 +60,9 @@
       },
     },
     oncreate() {
-      const match = this.get('match');
-      const projects = this.store.get('projectList');
-      const currentProject = projects
-        .find(p => p.id === match.params.slug);
-      this.set({ currentProject });
-      const fetchPrompts = () => {
-        this.set({ currentPrompts: null });
-        const name = this.get('uriName');
-        fetch(`/api/prompts/${name}`).then(res => res.json())
-          .then((currentPrompts) => {
-            this.set({ currentPrompts });
-          });
-      };
-      const fetchSubmissions = () => {
-        this.set({ currentSubmissions: null });
-        const name = this.get('uriName');
-        fetch(`/api/submissions/${name}`).then(res => res.json())
-          .then((currentSubmissions) => {
-            this.set({ currentSubmissions });
-          });
-      };
-      fetchPrompts();
-      fetchSubmissions();
-      this.observe('currentProject', () => {
-        fetchPrompts();
-        fetchSubmissions();
+      fetchProject.call(this).then(() => {
+        fetchPrompts.call(this);
+        fetchSubmissions.call(this);
       });
     },
   };

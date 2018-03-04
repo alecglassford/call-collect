@@ -24,7 +24,7 @@
   "scripts": {
     "build-docs": "node docs/_build.js",
     "build": "rollup -c",
-    "dev": "nodemon -r dotenv/config server.js & rollup -c -w",
+    "dev": "nodemon -r dotenv/config server.js --watch server.js & rollup -c -w",
     "start": "node server.js",
     "test": "eslint --ext .html,.js server/ client/"
   },

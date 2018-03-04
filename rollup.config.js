@@ -33,6 +33,9 @@ export default [
       production && buble({ exclude: 'node_modules/**' }),
       production && uglify(),
     ],
+    watch: {
+      include: 'client/**',
+    },
   },
   { // Rollup the Express server
     input: './server/main.js',
@@ -46,5 +49,8 @@ export default [
       commonjs(),
     ],
     external: id => id in pkg.dependencies || id === 'crypto' || id === 'fs' || id === 'path',
+    watch: {
+      include: 'server/**',
+    },
   },
 ];

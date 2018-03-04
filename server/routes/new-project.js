@@ -21,10 +21,10 @@ const newPhoneNumber = async function newPhoneNumberFunc(name, hostname) {
 export default async function newProject(req, res) {
   // error handling TK
   const hostname = process.env.NOW_URL || `${req.protocol}://${req.hostname}`;
-  const { name } = req.body;
+  const { name, description } = req.body;
   const phone = await newPhoneNumber(name, hostname);
   try {
-    const newProjectRecord = await db('projects').create({ name, phone });
+    const newProjectRecord = await db('projects').create({ name, description, phone });
     res.send(newProjectRecord);
   } catch (err) {
     res.sendStatus(500);

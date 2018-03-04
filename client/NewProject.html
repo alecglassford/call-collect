@@ -1,26 +1,19 @@
 <div>
   <h2>Create a new project</h2>
-  <h3>What do you want to call your project?</h3>
-  <input type="text" bind:value="name">
-  <h3>Upload your prompts here</h3>
-  {{#each files as file}}
-    <UploadPrompt bind:file/>
-  {{/each}}
-  <button on:click="oneMorePrompt()">➕ Add another prompt</button>
-  <button id="create" on:click="createProject()">🚂 Create project</button>
 
-  {{#if promptIds}}
-    {{#if !projectId}}
+  {{#if !creating}}
+    <h3>What do you want to call your project?</h3>
+    <input type="text" bind:value="name">
+    <h3>Add a description</h3>
+    <textarea bind:value="description"></textarea>
+    <button id="create" on:click="createProject()">🚂 Create project</button>
+  {{else}}
+    {{#if !project}}
       <p>Creating project record … <span class="loading"></span></p>
     {{else}}
-      <p>Project {{name}} saved as {{projectId}} ✅</p>
-      {{#each promptIds as promptId, index}}
-        {{#if !promptId}}
-          <p>Uploading prompt {{index}} … <span class="loading"></span></p>
-        {{else}}
-          <p>Prompt {{index}} saved as {{promptId}}. ✅</p>
-        {{/if}}
-      {{/each}}
+      <p>Your new project, {{name}}, was successfully created! ✅</p>
+      <p>It was assigned the phone number {{humanPhone(project.fields.phone)}}.</p>
+      <p>Visit <Link to="/project/{{project.id}}">the project page</Link> to add prompts.</p>
     {{/if}}
   {{/if}}
 </div>
@@ -61,51 +54,35 @@
 </style>
 
 <script>
-  import UploadPrompt from './UploadPrompt.html';
+  import Link from 'svelte-routing/Link.html';
+
+  import { humanPhone } from './util';
 
   export default {
-    components: { UploadPrompt },
+    components: { Link },
+    helpers: { humanPhone },
     methods: {
-      oneMorePrompt() {
-        const files = this.get('files');
-        files.push(null);
-        this.set({ files });
-      },
       createProject() {
-        const files = this.get('files');
-        this.set({ promptIds: files.map(() => null) });
-
+        this.set({ creating: true });
+        const { name, description } = this.get();
         fetch('/api/projects', {
           method: 'POST',
-          body: JSON.stringify({ name: this.get('name') }),
+          body: JSON.stringify({ name, description }),
           headers: new Headers({ 'Content-Type': 'application/json' }),
         }).then(res => res.json()).then((project) => {
-          const projectId = project.id;
-          this.set({ projectId });
-
-          for (let index = 0; index < files.length; index += 1) {
-            const fd = new FormData();
-            fd.append('projectId', projectId);
-            fd.append('index', index);
-            fd.append('promptAudio', files[index]);
-            fetch('/api/prompts', {
-              method: 'POST',
-              body: fd,
-            }).then(res => res.json()).then((prompt) => {
-              const promptIds = this.get('promptIds');
-              promptIds[index] = prompt.id;
-              this.set({ promptIds });
-            });
-          }
+          this.set({ project });
+          this.store.set({
+            projectList: fetch('/api/projects').then(res => res.json()),
+          });
         });
       },
     },
     data() {
       return {
-        name: 'put-name-here',
-        files: [null],
-        projectId: null,
-        promptIds: null,
+        name: '',
+        description: '',
+        project: null,
+        creating: false,
       };
     },
   };

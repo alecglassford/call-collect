@@ -2,6 +2,7 @@
 <div id="project-info">
   <h2>{{name}}</h2>
   <h3>{{humanPhone(currentProject.fields.phone)}}</h3>
+  {{#if currentProject.fields.description}}<p>{{currentProject.fields.description}}</p>{{/if}}
   {{#if !currentPrompts}}
     Loading prompts.
   {{else}}

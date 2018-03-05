@@ -205,7 +205,6 @@ const soundcite2 = function soundcite2Func(soundcite_elements, $Popcorn, $SoundC
     } else {
         soundcite.mobile = false;
     }
-    console.log('mobile', soundcite.mobile);
 
     var clips = [];
 
@@ -236,7 +235,6 @@ const soundcite2 = function soundcite2Func(soundcite_elements, $Popcorn, $SoundC
 
 // Clip
     function Clip(el) {
-      console.log('here');
         this.el = el;
         this.start = el.hasAttribute('data-start') ? el.getAttribute('data-start') : 0; // ms
         this.end = el.hasAttribute('data-end') ? el.getAttribute('data-end') : null;    // ms
@@ -398,7 +396,6 @@ const soundcite2 = function soundcite2Func(soundcite_elements, $Popcorn, $SoundC
             }, this));
 
             if(!soundcite.mobile) {
-              console.log('jlkjl');
                 this.sound_loaded();
             }
         }, this));
@@ -472,7 +469,6 @@ const soundcite2 = function soundcite2Func(soundcite_elements, $Popcorn, $SoundC
     for(var i = 0; i < soundcite_elements.length; i++) {
         var el = soundcite_elements[i];
         if(el.getAttribute('data-url')) {
-          console.log(el);
             new PopcornClip(el);
         } else if (el.getAttribute('data-id')) {
             new SoundCloudClip(el);
@@ -492,11 +488,8 @@ const soundcite2 = function soundcite2Func(soundcite_elements, $Popcorn, $SoundC
 };
 
 export default function initSoundcite() {
-  console.log('here');
   const audioDivs = document.getElementsByClassName('soundcite-audio');
-  console.log(audioDivs.length);
   while (audioDivs.length > 0) {
-    console.log('removing');
     audioDivs[0].remove();
   }
   setTimeout(() => {

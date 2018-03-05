@@ -18,6 +18,7 @@
           <audio controls src="{{audioUrl(prompt)}}"></audio>
         </div>
       {{/each}}
+      <UploadPrompt projectId="{{currentProject.id}}" index="{{currentPrompts.length}}" on:refreshPrompts/>
     </div>
   {{/if}}
   {{#if currentSubmissions}}
@@ -29,7 +30,6 @@
 <style>
   #project-info {
     margin: 0 auto;
-    max-width: 20em;
     text-align: center;
   }
 
@@ -64,10 +64,12 @@
 
 <script>
   import { humanIndex, humanPhone } from './util';
+  import UploadPrompt from './UploadPrompt.html';
 
   export default {
+    components: { UploadPrompt },
     computed: {
-      name: currentProject => currentProject ? currentProject.fields.name : '',
+      name: currentProject => (currentProject ? currentProject.fields.name : ''),
     },
     helpers: {
       audioUrl: prompt => prompt.fields.audio[0].url,
@@ -77,8 +79,8 @@
     data() {
       return {
         currentProject: null,
-        currentPrompts: null,
-        currentSubmissions: null,
+        currentPrompts: [],
+        currentSubmissions: [],
       };
     },
   };

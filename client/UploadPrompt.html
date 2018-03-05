@@ -1,15 +1,80 @@
-<input type="file" accept="audio/*"
-    on:change="updatePrompt(this.files)">
+<div class="{{ state === 'UNTOUCHED' ? '' : 'active'}}">
+  {{#if state === 'UNTOUCHED'}}
+    <button on:click="start()">➕ Add prompt</button>
+  {{elseif state === 'STARTED'}}
+    <p>
+      <label for="slug">Write a short slug for your prompt:</label>
+      <input id="slug" type="text" bind:value="slug">
+    </p>
+    <p>
+      <label for="audio">Upload your prompt as a .wav file: </label>
+      <input id="audio" type="file" accept="audio/*" on:change="loadAudio(this.files[0])">
+    </p>
+    {{#if msg}}<p class="msg">You must upload an audio file.</p>{{/if}}
+    <button on:click="uploadPrompt()">Submit slug and audio</button>
+  {{else}}
+    <Spinner/>
+  {{/if}}
+</div>
+
+<style>
+  .active {
+    border: 1px dashed black;
+    padding: 1em;
+  }
+
+  .msg {
+    color: red;
+  }
+</style>
 
 <script>
+  import Spinner from './Spinner.html';
+
   export default {
+    components: { Spinner },
     methods: {
-      updatePrompt(newFiles) {
-        this.set({ file: newFiles[0] });
+      start() {
+        this.set({ state: 'STARTED' });
+      },
+      loadAudio(file) {
+        this.set({ file });
+      },
+      uploadPrompt() {
+        // eslint-disable-next-line object-curly-newline
+        const { projectId, index, slug, file } = this.get();
+        if (!file) {
+          this.set({ msg: true });
+          return;
+        }
+        this.set({ state: 'UPLOADING' });
+        const fd = new FormData();
+        fd.append('projectId', projectId);
+        fd.append('index', index);
+        fd.append('slug', slug);
+        fd.append('promptAudio', file);
+        fetch('/api/prompts', {
+          method: 'POST',
+          body: fd,
+        }).then(() => {
+          this.fire('refreshPrompts');
+        });
       },
     },
     data() {
-      return { file: null };
+      return {
+        state: 'UNTOUCHED',
+        msg: false,
+        projectId: null,
+        index: -1, // this ... shouldn't happen
+        slug: '',
+        file: null,
+      };
+    },
+    oncreate() {
+      this.observe('index', () => { // Detects when successfully uploaded prompt
+        this.set({ msg: false, state: 'UNTOUCHED' });
+      });
     },
   };
 </script>

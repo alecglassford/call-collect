@@ -1,5 +1,5 @@
 <div>
-  <ProjectInfo :currentProject :currentPrompts :currentSubmissions/>
+  <ProjectInfo :currentProject :currentPrompts :currentSubmissions on:refreshPrompts="refreshPrompts()"/>
   <Submissions :currentProject :currentPrompts :currentSubmissions/>
 </div>
 
@@ -27,7 +27,6 @@
   };
 
   const fetchPrompts = function fetchPromptsFunc() {
-    this.set({ currentPrompts: null });
     const name = this.get('uriName');
     fetch(`/api/prompts/${name}`).then(res => res.json())
       .then((currentPrompts) => {
@@ -36,7 +35,6 @@
   };
 
   const fetchSubmissions = function fetchSubmissionsFunc() {
-    this.set({ currentSubmissions: null });
     const name = this.get('uriName');
     fetch(`/api/submissions/${name}`).then(res => res.json())
       .then((currentSubmissions) => {
@@ -64,6 +62,11 @@
         fetchPrompts.call(this);
         fetchSubmissions.call(this);
       });
+    },
+    methods: {
+      refreshPrompts() {
+        fetchPrompts.call(this);
+      },
     },
   };
 </script>

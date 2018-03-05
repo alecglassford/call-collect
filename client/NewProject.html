@@ -9,7 +9,7 @@
     <button id="create" on:click="createProject()">🚂 Create project</button>
   {{else}}
     {{#if !project}}
-      <p>Creating project record … <span class="loading"></span></p>
+      <p>Creating project record … <Spinner/></p>
     {{else}}
       <p>Your new project, {{name}}, was successfully created! ✅</p>
       <p>It was assigned the phone number {{humanPhone(project.fields.phone)}}.</p>
@@ -31,21 +31,6 @@
     outline: none;
   }
 
-  .loading {
-		display: inline-block;
-    margin-left: 1em;
-    border: 2px solid #ddd;
-    border-top: 2px solid blue;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    animation: spin 1s linear infinite;
-  }
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
   #create {
     margin: 2em auto;
     width: 50%;
@@ -57,9 +42,10 @@
   import Link from 'svelte-routing/Link.html';
 
   import { humanPhone } from './util';
+  import Spinner from './Spinner.html';
 
   export default {
-    components: { Link },
+    components: { Link, Spinner },
     helpers: { humanPhone },
     methods: {
       createProject() {

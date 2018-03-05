@@ -24,7 +24,7 @@
   "scripts": {
     "build-docs": "node docs/_build.js",
     "build": "rollup -c",
-    "dev": "nodemon -r dotenv/config server.js --watch server.js & rollup -c -w",
+    "dev": "nodemon -r dotenv/config -r source-map-support/register server.js --watch server.js & rollup -c -w",
     "start": "node server.js",
     "test": "eslint --ext .html,.js server/ client/"
   },
@@ -58,6 +58,7 @@
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-svelte": "^4.0.0",
     "rollup-plugin-uglify": "^3.0.0",
+    "source-map-support": "^0.5.3",
     "svelte": "^1.55.1",
     "svelte-routing": "^0.2.0",
     "svelte-transitions": "^1.1.1"

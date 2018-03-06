@@ -1,60 +1,55 @@
-<div>
-  <h2>Your Projects</h2>
-  {{#await $projectList}}
-    <p>Waiting for project list...</p>
-  {{then projects}}
-      {{#if projects.length === 0}}
-        <p>You don't have any projects yet.</p>
-      {{else}}
-        {{#each projects as project}}
-          <Link to="/project/{{project.id}}">
-            {{project.fields.name}}
-          </Link>
-        {{/each}}
-      {{/if}}
-      <Link to="/new-project"><strong>➕ New project</strong></Link>
-  {{catch err}}
-    <p>Error getting project names</p>
-  {{/await}}
+<div class="row">
+  <div class="col-12 text-center">
+    <h1 class="display-1 serif">Call Collect</h1>
+    <Link to="/new-project" className="mb-3 btn btn-primary">➕ New project</Link>
+  </div>
 </div>
-
-<style>
-  div {
-    margin: 0 auto;
-    padding: 1em 0;
-    background-color: #2E4053;
-    color: #F4F6F7;
-  }
-
-  h2 {
-    text-align: center;
-    font-family: "Source Serif Pro", Palatino, Georgia, serif;
-  }
-
-  div :global(a) {
-    display: block;
-    min-height: 2em;
-    margin: 0;
-    padding: 0.5em;
-    border-top: 1px solid grey;
-    text-align: center;
-    font-family: sans-serif;
-  }
-
-  div :global(a:hover) {
-    background-color: steelblue;
-  }
-
-  div :global(a), :global(a:visited) {
-    text-decoration: none;
-    color: white;
-  }
-</style>
+{{#await $projectList}}
+  <div class="text-center"><Spinner/></div>
+{{then projects}}
+    {{#if projects.length === 0}}
+      <p>You don't have any projects yet.</p>
+    {{else}}
+      <table class="table">
+        <thead>
+          <th scope="col">Project</th>
+          <th scope="col">Phone Number</th>
+          <th scope="col">Project creation date</th>
+          <th scope="col"># of prompts</th>
+          <th scope="col"># of submissions</th>
+        </thead>
+        <tbody>
+        {{#each projects as project}}
+          <tr>
+            <th scope="row">
+              <Link to="/project/{{project.id}}">{{project.fields.name}}</Link>
+            </th>
+            <td>{{humanPhone(project.fields.phone)}}</td>
+            <td>{{day(project.createdTime)}}</td>
+            <td>{{numPrompts(project)}}</td>
+            <td>{{numSubs(project)}}</td>
+          </tr>
+        {{/each}}
+        </tbody>
+      </table>
+    {{/if}}
+{{catch err}}
+  <p>Error getting project names</p>
+{{/await}}
 
 <script>
   import Link from 'svelte-routing/Link.html';
 
+  import Spinner from './Spinner.html';
+  import { humanPhone } from './util';
+
   export default {
-    components: { Link },
+    components: { Link, Spinner },
+    helpers: {
+      day: dateStr => (new Date(dateStr)).toDateString(),
+      humanPhone,
+      numPrompts: project => (project.fields.prompts ? project.fields.prompts.length : 0),
+      numSubs: project => (project.fields.submissions ? project.fields.submissions.length : 0),
+    },
   };
 </script>

@@ -1,13 +1,10 @@
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
 @import url('https://fonts.googleapis.com/css?family=Source+Serif+Pro');
 
-body {
-  margin: 0;
+.bg-secondary {
+  background-color: #85C1E9 !important;
 }
 
-#wrapper {
-  margin: 0;
-  min-height: 100vh;
-  font-family: "Source Sans Pro", sans-serif;
-  font-size: 1.2em;
+.serif {
+  font-family: "Source Serif Pro", Georgia, serif;
 }

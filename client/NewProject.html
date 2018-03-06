@@ -1,12 +1,14 @@
-<div>
-  <h2>Create a new project</h2>
-
+<div id="new-project" class="mx-auto text-center">
+  <h2 class="display-4 serif">Create a new project</h2>
   {{#if !creating}}
-    <h3>What do you want to call your project?</h3>
-    <input type="text" bind:value="name">
-    <h3>Add a description</h3>
-    <textarea bind:value="description"></textarea>
-    <button id="create" on:click="createProject()">🚂 Create project</button>
+    <label for="project-name"><h3>What do you want to call your project?</h3></label>
+    <input type="text" bind:value="name" class="form-control {{invalid?'is-invalid':''}}" id="project-name">
+    {{#if invalid}}<p class="invalid-feedback">Please enter a name.</p>{{/if}}
+
+    <label for="project-desc"><h3>Add a description</h3></label>
+    <textarea bind:value="description" class="form-control" id="project-desc"></textarea>
+
+    <button class="mt-3 btn btn-primary" on:click="createProject()">🚂 Create project</button>
   {{else}}
     {{#if !project}}
       <p>Creating project record … <Spinner/></p>
@@ -19,22 +21,8 @@
 </div>
 
 <style>
-  div {
-    margin: 0 auto;
-    max-width: 30em;
-    display: flex;
-    flex-direction: column;
-  }
-
-  input[type="text"] {
-    font-size: 1.5em;
-    outline: none;
-  }
-
-  #create {
-    margin: 2em auto;
-    width: 50%;
-    height: 5em;
+  #new-project {
+    max-width: 720px;
   }
 </style>
 
@@ -49,8 +37,12 @@
     helpers: { humanPhone },
     methods: {
       createProject() {
-        this.set({ creating: true });
         const { name, description } = this.get();
+        if (!name) {
+          this.set({ invalid: true });
+          return;
+        }
+        this.set({ creating: true });
         fetch('/api/projects', {
           method: 'POST',
           body: JSON.stringify({ name, description }),
@@ -67,6 +59,7 @@
       return {
         name: '',
         description: '',
+        invalid: false,
         project: null,
         creating: false,
       };

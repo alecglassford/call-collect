@@ -1,5 +1,5 @@
 <div>
-  <ProjectInfo :currentProject :currentPrompts :currentSubmissions on:refreshPrompts="refreshPrompts()"/>
+  <ProjectInfo :currentProject :currentPrompts :currentSubmissions on:refreshPrompts="refreshPrompts(event)"/>
   <Submissions :currentProject :currentPrompts :currentSubmissions/>
 </div>
 
@@ -31,6 +31,7 @@
     fetch(`/api/prompts/${name}`).then(res => res.json())
       .then((currentPrompts) => {
         this.set({ currentPrompts });
+        this.set({ originalOrder: currentPrompts.map(p => p.id) });
       });
   };
 
@@ -48,6 +49,7 @@
       return {
         currentProject: null,
         currentPrompts: null,
+        originalOrder: null, // array of promptIds
         currentSubmissions: null,
       };
     },
@@ -64,8 +66,25 @@
       });
     },
     methods: {
-      refreshPrompts() {
-        fetchPrompts.call(this);
+      refreshPrompts(ev) {
+        if (!ev.reorderedPrompts) {
+          fetchPrompts.call(this);
+          return;
+        }
+        const changed = [];
+        const [old, reordered] = [this.get('originalOrder'), ev.reorderedPrompts];
+        for (let i = 0; i < old.length; i += 1) {
+          if (old[i] !== reordered[i].id) changed.push([reordered[i].id, i]);
+        }
+        const name = this.get('uriName');
+        fetch(`/api/prompts/${name}`, {
+          method: 'PUT',
+          body: JSON.stringify(changed),
+          headers: new Headers({ 'Content-Type': 'application/json' }),
+        }).then(res => res.json()).then((currentPrompts) => {
+          this.set({ currentPrompts });
+          this.set({ originalOrder: currentPrompts.map(p => p.id) });
+        });
       },
     },
   };

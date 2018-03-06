@@ -1,6 +1,5 @@
 import db from '../db';
 
-
 export default async function getPrompts(req, res) {
   const hostname = process.env.NOW_URL || `${req.protocol}://${req.hostname}`;
   const { projectName } = req.params;

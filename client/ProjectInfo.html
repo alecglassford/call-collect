@@ -4,22 +4,30 @@
   <h3>{{humanPhone(currentProject.fields.phone)}}</h3>
   {{#if currentProject.fields.description}}<p>{{currentProject.fields.description}}</p>{{/if}}
   {{#if !currentPrompts}}
-    Loading prompts.
+    <Spinner/>
   {{else}}
     <div id="prompts-container">
-      {{#each currentPrompts as prompt}}
+      {{#each currentPrompts as prompt, i}}
         <div>
+          <div class="reorder">
+            <button on:click="up(i)">⬆️</button>
+            {{#if i !== currentPrompts.length - 1}}<button on:click="down(i)">⬇️</button>{{/if}}
+          </div>
           <h4>
             {{#if prompt.fields.slug}}
               {{prompt.fields.slug}}
             {{else}}
               Prompt {{humanIndex(prompt.fields.index)}}
             {{/if}}
-            </h4>
+          </h4>
           <audio controls src="{{audioUrl(prompt)}}"></audio>
         </div>
       {{/each}}
-      <UploadPrompt projectId="{{currentProject.id}}" index="{{currentPrompts.length}}" on:refreshPrompts/>
+      {{#if promptsChanged}}
+        <button on:click="saveReorder()">Save new prompt order</button>
+      {{else}}
+        <UploadPrompt projectId="{{currentProject.id}}" index="{{currentPrompts.length}}" on:refreshPrompts/>
+      {{/if}}
     </div>
   {{/if}}
   {{#if currentSubmissions}}
@@ -45,13 +53,41 @@
     font-size: 1.5em;
   }
 
-  #prompts-container div {
+  #prompts-container > div {
     margin: 1em 0;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
+    position: relative;
   }
+
+  /*** reorder buttons ***/
+
+  #prompts-container .reorder {
+    visibility:hidden;
+    position: absolute;
+    left: -1em;
+  }
+
+  #prompts-container div:hover .reorder {
+    visibility: visible;
+  }
+
+  .reorder button {
+    display: block;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    cursor: pointer;
+  }
+
+  /* hides up arrow for first prompt */
+  div:first-child > .reorder > button:first-child {
+    visibility: hidden;
+  }
+
+  /*** Other prompt ***/
 
   h4 {
     margin: 0 0.5em;
@@ -65,10 +101,11 @@
 
 <script>
   import { humanIndex, humanPhone } from './util';
+  import Spinner from './Spinner.html';
   import UploadPrompt from './UploadPrompt.html';
 
   export default {
-    components: { UploadPrompt },
+    components: { Spinner, UploadPrompt },
     computed: {
       name: currentProject => (currentProject ? currentProject.fields.name : ''),
     },
@@ -80,9 +117,28 @@
     data() {
       return {
         currentProject: null,
-        currentPrompts: [],
-        currentSubmissions: [],
+        currentPrompts: null,
+        currentSubmissions: null,
+        promptsChanged: false,
       };
+    },
+    methods: {
+      up(i) {
+        const currentPrompts = this.get('currentPrompts');
+        [currentPrompts[i - 1], currentPrompts[i]] = [currentPrompts[i], currentPrompts[i - 1]];
+        this.set({ currentPrompts, promptsChanged: true });
+      },
+      down(i) {
+        const currentPrompts = this.get('currentPrompts');
+        [currentPrompts[i + 1], currentPrompts[i]] = [currentPrompts[i], currentPrompts[i + 1]];
+        this.set({ currentPrompts, promptsChanged: true });
+      },
+      saveReorder() {
+        // Tell parent to find differences and update with PUT request
+        this.fire('refreshPrompts', { reorderedPrompts: this.get('currentPrompts') });
+        // Spinner until parent confirms save
+        this.set({ currentPrompts: null, promptsChanged: false });
+      },
     },
   };
 </script>

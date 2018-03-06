@@ -57,7 +57,7 @@
           method: 'POST',
           body: fd,
         }).then(() => {
-          this.fire('refreshPrompts');
+          this.fire('refreshPrompts', {});
         });
       },
     },

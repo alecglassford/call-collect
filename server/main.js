@@ -3,6 +3,7 @@ import multer from 'multer';
 
 import getProjectNames from './routes/projects';
 import getPrompts from './routes/get-prompts';
+import reorderPrompts from './routes/reorder-prompts';
 import getSubmissions from './routes/get-submissions';
 import newProject from './routes/new-project';
 import newPrompt from './routes/new-prompt';
@@ -19,6 +20,7 @@ const upload = multer({
 app.use(express.static('public'));
 app.get('/api/projects', getProjectNames);
 app.get('/api/prompts/:projectName', getPrompts);
+app.put('/api/prompts/:projectName', express.json(), reorderPrompts);
 app.get('/api/submissions/:projectName', getSubmissions);
 app.post('/api/projects', express.json(), newProject);
 app.post('/api/prompts', upload.single('promptAudio'), newPrompt);

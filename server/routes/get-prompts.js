@@ -14,7 +14,7 @@ export default async function getPrompts(req, res) {
         if (!p.fields.audio) throw Error('Prompt is missing audio.'); // bad :(
         return !p.fields.audio[0].url.startsWith(hostname); // wait + loop back
       })) {
-        res.json(prompts);
+        res.json(prompts.map(p => p._rawJson)); // eslint-disable-line no-underscore-dangle
         return;
       }
       // If we do, wait a second and try again (hopefully Airable will have processed)

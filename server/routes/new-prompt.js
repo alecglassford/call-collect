@@ -18,6 +18,7 @@ export default async function newPrompt(req, res) {
     // No point in sending actual prompt obj, because audio won't be ready in Airtable
     // Instead we'll just refetch from get-prompts if needed: one source of prompt data
     // May be slower, but easier to deal with, and we'll check there to make sure audio is ready
+    // TK maybe there's a better way to do that here --> return all the prompts here?
   } catch (err) {
     res.sendStatus(500);
   }

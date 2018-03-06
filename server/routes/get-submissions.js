@@ -10,7 +10,7 @@ export default async function getSubmissions(req, res) {
         { field: 'prompt', direction: 'asc' },
       ],
     }).all();
-    res.json(submissions);
+    res.json(submissions.map(s => s._rawJson)); // eslint-disable-line no-underscore-dangle
   } catch (err) {
     console.error(err);
     res.sendStatus(500);

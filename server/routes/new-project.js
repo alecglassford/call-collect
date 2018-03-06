@@ -25,7 +25,7 @@ export default async function newProject(req, res) {
   const phone = await newPhoneNumber(name, hostname);
   try {
     const newProjectRecord = await db('projects').create({ name, description, phone });
-    res.send(newProjectRecord);
+    res.send(newProjectRecord._rawJson); // eslint-disable-line no-underscore-dangle
   } catch (err) {
     res.sendStatus(500);
   }

@@ -5,7 +5,7 @@ export default async function getProjects(req, res) {
     const projects = await db('projects').select({
       sort: [{ field: 'name', direction: 'asc' }],
     }).all();
-    res.json(projects);
+    res.json(projects.map(p => p._rawJson)); // eslint-disable-line no-underscore-dangle
   } catch (err) {
     res.sendStatus(500);
   }

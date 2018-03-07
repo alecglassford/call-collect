@@ -149,7 +149,7 @@
       };
     },
     computed: {
-      projectName: currentProject => currentProject ? currentProject.fields.name: '',
+      projectName: currentProject => (currentProject ? currentProject.fields.name : ''),
       callers: function callersFunc(currentSubmissions) {
         if (!currentSubmissions) return null;
         return Array.from(new Set(currentSubmissions.map(sub => sub.fields.caller)));

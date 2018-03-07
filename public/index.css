@@ -1,8 +1,22 @@
-@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
 @import url('https://fonts.googleapis.com/css?family=Source+Serif+Pro');
 
-.bg-secondary {
+body {
+  min-height: 100vh;
+}
+
+/* TK compile all this into Bootstrap? */
+
+.bg-primary {
   background-color: #85C1E9 !important;
+}
+
+.btn-primary {
+  background-color: #85C1E9;
+  border-color: #85C1E9;
+}
+
+.bg-light {
+  background-color: #FBFCFC !important;
 }
 
 .serif {

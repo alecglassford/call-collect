@@ -3,7 +3,7 @@
   {{#if !creating}}
     <label for="project-name"><h3>What do you want to call your project?</h3></label>
     <input type="text" bind:value="name" class="form-control {{invalid?'is-invalid':''}}" id="project-name">
-    {{#if invalid}}<p class="invalid-feedback">Please enter a name.</p>{{/if}}
+    <p class="invalid-feedback">Please enter a name.</p>
 
     <label for="project-desc"><h3>Add a description</h3></label>
     <textarea bind:value="description" class="form-control" id="project-desc"></textarea>

@@ -1,17 +1,5 @@
-<div>
-  <ProjectInfo :currentProject :currentPrompts :currentSubmissions on:refreshPrompts="refreshPrompts(event)"/>
-  <Submissions :currentProject :currentPrompts :currentSubmissions/>
-</div>
-
-<style>
-  div {
-    flex-grow: 1;
-    background-color: #FBFCFC;
-    padding: 1em;
-    display: flex;
-    flex-direction: column;
-  }
-</style>
+<ProjectInfo :currentProject :currentPrompts :currentSubmissions on:refreshPrompts="refreshPrompts(event)"/>
+<Submissions :currentProject :currentPrompts :currentSubmissions/>
 
 <script>
   import ProjectInfo from './ProjectInfo.html';

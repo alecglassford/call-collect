@@ -10,7 +10,7 @@ window.store = store; // TK only for dev
 
 createHistory('browser');
 const app = new App({
-  target: document.getElementById('wrapper'),
+  target: document.body,
   store,
 });
 

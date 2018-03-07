@@ -1,32 +1,20 @@
-<div class="{{ state === 'UNTOUCHED' ? '' : 'active'}}">
-  {{#if state === 'UNTOUCHED'}}
-    <button on:click="start()">➕ Add prompt</button>
-  {{elseif state === 'STARTED'}}
-    <p>
-      <label for="slug">Write a short slug for your prompt:</label>
-      <input id="slug" type="text" bind:value="slug">
-    </p>
-    <p>
-      <label for="audio">Upload your prompt as a .wav file: </label>
-      <input id="audio" type="file" accept="audio/*" on:change="loadAudio(this.files[0])">
-    </p>
-    {{#if msg}}<p class="msg">You must upload an audio file.</p>{{/if}}
-    <button on:click="uploadPrompt()">Submit slug and audio</button>
-  {{else}}
-    <Spinner/>
-  {{/if}}
-</div>
+{{#if state === 'UNTOUCHED'}}
+  <button on:click="start()" class="btn btn-primary mt-3">➕ Add prompt</button>
+{{elseif state === 'STARTED'}}
+  <div class="mt-3 border p-3">
+    <label for="slug">Write a short slug for your prompt:</label>
+    <input id="slug" type="text" bind:value="slug" class="form-control">
 
-<style>
-  .active {
-    border: 1px dashed black;
-    padding: 1em;
-  }
+    <label for="audio">Upload your prompt as a .wav file: </label>
+    <input id="audio" type="file" accept="audio/*" on:change="loadAudio(this.files[0])"
+      class="form-control form-control-file {{invalid?'is-invalid':''}}">
+    <p class="invalid-feedback">You must upload an audio file.</p>
 
-  .msg {
-    color: red;
-  }
-</style>
+    <button on:click="uploadPrompt()" class="btn btn-success mt-3">Submit slug and audio</button>
+  </div>
+{{else}}
+  <Spinner/>
+{{/if}}
 
 <script>
   import Spinner from './Spinner.html';
@@ -41,10 +29,12 @@
         this.set({ file });
       },
       uploadPrompt() {
+        console.log('wut');
         // eslint-disable-next-line object-curly-newline
         const { projectId, index, slug, file } = this.get();
         if (!file) {
-          this.set({ msg: true });
+          this.set({ invalid: true });
+          console.log('yo');
           return;
         }
         this.set({ state: 'UPLOADING' });
@@ -64,7 +54,7 @@
     data() {
       return {
         state: 'UNTOUCHED',
-        msg: false,
+        invalid: false,
         projectId: null,
         index: -1, // this ... shouldn't happen
         slug: '',
@@ -73,7 +63,7 @@
     },
     oncreate() {
       this.observe('index', () => { // Detects when successfully uploaded prompt
-        this.set({ msg: false, state: 'UNTOUCHED' });
+        this.set({ invalid: false, state: 'UNTOUCHED' });
       });
     },
   };

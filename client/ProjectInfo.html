@@ -1,76 +1,57 @@
 {{#if currentProject}}
-<div id="project-info">
-  <h2>{{name}}</h2>
-  <h3>{{humanPhone(currentProject.fields.phone)}}</h3>
-  {{#if currentProject.fields.description}}<p>{{currentProject.fields.description}}</p>{{/if}}
-  {{#if !currentPrompts}}
-    <Spinner/>
-  {{else}}
-    <div id="prompts-container">
-      {{#each currentPrompts as prompt, i}}
-        <div>
-          <div class="reorder">
-            <button on:click="up(i)">⬆️</button>
-            {{#if i !== currentPrompts.length - 1}}<button on:click="down(i)">⬇️</button>{{/if}}
-          </div>
-          <h4>
-            {{#if prompt.fields.slug}}
-              {{prompt.fields.slug}}
-            {{else}}
-              Prompt {{humanIndex(prompt.fields.index)}}
-            {{/if}}
-          </h4>
-          <audio controls src="{{audioUrl(prompt)}}"></audio>
-        </div>
-      {{/each}}
-      {{#if promptsChanged}}
-        <button on:click="saveReorder()">Save new prompt order</button>
+  <div id="project-info" class="row mx-auto">
+    <div class="col-12 text-center">
+      <h2 class="display-4 serif">{{name}}</h2>
+      <h3>{{humanPhone(currentProject.fields.phone)}}</h3>
+      {{#if currentProject.fields.description}}<p>{{currentProject.fields.description}}</p>{{/if}}
+      {{#if currentSubmissions}}
+      <p>This project has received {{currentSubmissions.length}} submissions.</p>
+      {{/if}}
+      {{#if !currentPrompts}}
+        <Spinner/>
       {{else}}
-        <UploadPrompt projectId="{{currentProject.id}}" index="{{currentPrompts.length}}" on:refreshPrompts/>
+        <div>
+          {{#each currentPrompts as prompt, i}}
+            <div class="row mt-3">
+              <div class="reorder">
+                <button on:click="up(i)">⬆️</button>
+                {{#if i !== currentPrompts.length - 1}}<button on:click="down(i)">⬇️</button>{{/if}}
+              </div>
+              <h4 class="col-sm-6 text-left">
+                {{#if prompt.fields.slug}}
+                  {{prompt.fields.slug}}
+                {{else}}
+                  Prompt {{humanIndex(prompt.fields.index)}}
+                {{/if}}
+              </h4>
+              <audio controls src="{{audioUrl(prompt)}}" class="col-sm-6"></audio>
+            </div>
+          {{/each}}
+        </div>
+        {{#if promptsChanged}}
+          <button on:click="saveReorder()" class="btn btn-success mt-3">Save new prompt order</button>
+        {{else}}
+          <UploadPrompt projectId="{{currentProject.id}}" index="{{currentPrompts.length}}" on:refreshPrompts/>
+        {{/if}}
       {{/if}}
     </div>
-  {{/if}}
-  {{#if currentSubmissions}}
-    <p>This project has received {{currentSubmissions.length}} submissions.</p>
-  {{/if}}
-</div>
+  </div>
 {{/if}}
 
 <style>
   #project-info {
-    margin: 0 auto;
-    text-align: center;
-  }
-
-  h2 {
-    margin: 0;
-    font-size: 2em;
-    font-family: "Source Serif Pro", Palatino, Georgia, serif;
-  }
-
-  h3 {
-    margin-top: 0.5em;
-    font-size: 1.5em;
-  }
-
-  #prompts-container > div {
-    margin: 1em 0;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    position: relative;
+    max-width: 720px;
   }
 
   /*** reorder buttons ***/
 
-  #prompts-container .reorder {
+  .reorder {
     visibility:hidden;
     position: absolute;
     left: -1em;
   }
 
-  #prompts-container div:hover .reorder {
+  div:hover > .reorder {
     visibility: visible;
   }
 
@@ -86,17 +67,6 @@
   /* hides up arrow for first prompt */
   div:first-child > .reorder > button:first-child {
     visibility: hidden;
-  }
-
-  /*** Other prompt ***/
-
-  h4 {
-    margin: 0 0.5em;
-    font-size: 1.2em;
-  }
-
-  audio {
-    max-width: 50%;
   }
 </style>
 

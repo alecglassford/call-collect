@@ -1,0 +1,134 @@
+<button id="start-stop" class="{{state}}" on:click="startStop()">
+  <span id="button-text">{{ stateSymbol }}</span>
+</button>
+{{#if audioBlob}}
+  <audio src="{{audioBlobUrl}}" ref:player bind:currentTime bind:duration on:pause="pause()"></audio>
+  <!-- TK fix infinity -->
+  <span>
+    {{#if state === 'playing'}}{{Math.round(currentTime)}} / {{/if}}
+    {{Math.round(duration)}} seconds
+  </span>
+  <button class="btn" on:click="upload()">Submit recording</button>
+  <button class="btn" on:click="discard()">Discard recording</button>
+{{/if}}
+
+<style>
+  #start-stop {
+    color: red;
+    border: 2px solid red;
+    border-radius: 50%;
+    font-size: 2em;
+    width: 1.5em;
+    height: 1.5em;
+    cursor: pointer;
+  }
+
+  #button-text {
+    position: relative;
+    bottom: 0.02em; /* this is dumb */
+  }
+
+  #start-stop.recording {
+    outline: none; /* TK a11y: tabbing messed up */
+    border: none;
+    border-top: 2px solid red;
+    animation: spin 1s linear infinite;
+  }
+
+  .recording #button-text {
+    display: inline-block;
+    animation: spin 1s linear infinite reverse;
+  }
+
+  #start-stop.paused {
+    color: black;
+    border-color: black;
+  }
+
+  #start-stop.playing {
+    color: green;
+    border-color: green;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+
+<script>
+  const startRecording = function startRecordingFunc() { // TK refactor
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      const audioData = [];
+      const recorder = new MediaRecorder(stream);
+      recorder.ondataavailable = (ev) => {
+        audioData.push(ev.data);
+      };
+      recorder.onstop = () => {
+        const audioBlob = new Blob(audioData, { type: 'audio/webm' }); // TK wav, cross-platform
+        this.set({ audioBlob });
+        recorder.stream.getTracks().forEach((track) => {
+          track.stop();
+        });
+      };
+      recorder.start();
+      this.set({ state: 'recording', recorder });
+    }).catch(() => { // TK better error handling - use err msg
+      this.set({ state: 'error' });
+    });
+  };
+
+  const stopRecording = function stopRecordingFunc() {
+    this.get('recorder').stop();
+    this.set({ state: 'paused' });
+  };
+
+  const play = function playFunc() {
+    this.refs.player.play().then(() => {
+      this.set({ state: 'playing' });
+    });
+  };
+
+  export default {
+    data() {
+      return {
+        state: 'untouched',
+        recorder: null,
+        audioBlob: null,
+        currentTime: null,
+        duration: null,
+      };
+    },
+    computed: {
+      stateSymbol(state) {
+        if (state === 'untouched') return '·';
+        if (state === 'recording') return '▪';
+        if (state === 'paused') return '▸';
+        return '‖'; // state === 'playing' TK better - bootstrap icon?
+      },
+      audioBlobUrl: audioBlob => (audioBlob ? URL.createObjectURL(audioBlob) : null),
+    },
+    methods: {
+      startStop() { // TK use a switch statement or a function mappy thing lol
+        const state = this.get('state');
+        if (state === 'untouched') startRecording.call(this);
+        else if (state === 'recording') stopRecording.call(this);
+        else if (state === 'paused') play.call(this);
+        else this.pause(); // state === 'playing'
+      },
+      pause() {
+        this.refs.player.pause();
+        this.set({ state: 'paused' });
+      },
+      discard() {
+        this.set({
+          state: 'untouched',
+          recorder: null,
+          audioBlob: null,
+          currentTime: null,
+          duration: null,
+        });
+      },
+    },
+  };
+</script>

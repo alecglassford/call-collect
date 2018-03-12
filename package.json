@@ -51,6 +51,7 @@
     "husky": "^0.15.0-rc.8",
     "marked": "^0.3.17",
     "nodemon": "^1.17.1",
+    "obvi": "github:googlecreativelab/obvi#semver:^3.0.0",
     "rollup": "^0.56.4",
     "rollup-plugin-buble": "^0.19.2",
     "rollup-plugin-commonjs": "^8.4.1",

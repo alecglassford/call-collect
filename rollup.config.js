@@ -29,7 +29,10 @@ export default [
       }),
       resolve(),
       commonjs(),
-      replace({ 'process.env.NODE_ENV': '"production"' }),
+      replace({
+        'process.env.NODE_ENV': '"production"',
+        'function VoiceRecorder': 'export default function VoiceRecorder', // TK this sucks
+      }),
       production && buble({ exclude: 'node_modules/**' }),
       production && uglify(),
     ],

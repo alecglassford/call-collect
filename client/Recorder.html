@@ -57,29 +57,36 @@
 </style>
 
 <script>
+  import VoiceRecorder from 'obvi/voice-recorder';
+
   const startRecording = function startRecordingFunc() { // TK refactor
-    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-      const audioData = [];
-      const recorder = new MediaRecorder(stream);
-      recorder.ondataavailable = (ev) => {
-        audioData.push(ev.data);
-      };
-      recorder.onstop = () => {
-        const audioBlob = new Blob(audioData, { type: 'audio/webm' }); // TK wav, cross-platform
-        this.set({ audioBlob });
-        recorder.stream.getTracks().forEach((track) => {
-          track.stop();
-        });
-      };
-      recorder.start();
-      this.set({ state: 'recording', recorder });
-    }).catch(() => { // TK better error handling - use err msg
-      this.set({ state: 'error' });
+    const recorder = new VoiceRecorder(false, (blob) => {
+      console.log(blob.size);
     });
+    recorder.startRecord();
+    this.set({ state: 'recording', recorder });
+    // navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+    //   const audioData = [];
+    //   const recorder = new MediaRecorder(stream);
+    //   recorder.ondataavailable = (ev) => {
+    //     audioData.push(ev.data);
+    //   };
+    //   recorder.onstop = () => {
+    //     const audioBlob = new Blob(audioData, { type: 'audio/webm' }); // TK wav, cross-platform
+    //     this.set({ audioBlob });
+    //     recorder.stream.getTracks().forEach((track) => {
+    //       track.stop();
+    //     });
+    //   };
+    //   recorder.start();
+    //   this.set({ state: 'recording', recorder });
+    // }).catch(() => { // TK better error handling - use err msg
+    //   this.set({ state: 'error' });
+    // });
   };
 
   const stopRecording = function stopRecordingFunc() {
-    this.get('recorder').stop();
+    this.get('recorder').stopRecord();
     this.set({ state: 'paused' });
   };
 
@@ -128,6 +135,9 @@
           currentTime: null,
           duration: null,
         });
+      },
+      upload() {
+        console.log('tk');
       },
     },
   };

@@ -2,11 +2,61 @@
   <h2 class="display-4 serif">Create a new project</h2>
   {{#if !creating}}
     <label for="project-name"><h3>What do you want to call your project?</h3></label>
-    <input type="text" bind:value="name" class="form-control {{invalid?'is-invalid':''}}" id="project-name">
+    <input type="text" bind:value="name" class="form-control {{(invalid && !name) ? 'is-invalid' : ''}}" id="project-name">
     <p class="invalid-feedback">Please enter a name.</p>
 
-    <label for="project-desc"><h3>Add a description</h3></label>
-    <textarea bind:value="description" class="form-control" id="project-desc"></textarea>
+    <label for="project-desc" class="mt-3"><h3>Add a description</h3></label>
+    <textarea bind:value="description" class="form-control mb-3" id="project-desc"></textarea>
+
+    {{#await $projectList}}
+      <Spinner/>
+    {{then projects}}
+      <label for="phone-type"><h3>Choose a phone number for your project</h3></label>
+      <div id="phone-type" class="mb-3">
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" id="no-phone" value="no" bind:group="phoneType">
+          <label class="form-check-label" for="no-phone">No phone number</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" id="existing-phone" value="existing" bind:group="phoneType"
+            disabled="{{projects.filter(p => p.fields.phone).length === 0}}">
+          <label class="form-check-label" for="existing-phone">Reuse existing phone number</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" id="new-phone" value="new" bind:group="phoneType">
+          <label class="form-check-label" for="new-phone">Make a new phone number</label>
+        </div>
+      </div>
+
+      {{#if phoneType === 'existing'}}
+        <div>
+          <select class="form-control {{(invalid && !stealPhone) ? 'is-invalid' : ''}}" bind:value="stealPhone">
+            <option value="">Click to select</option>
+            {{#each projects.filter(p => p.fields.phone) as project}}
+              <option value="{{project.id}}">
+                {{humanPhone(project.fields.phone)}} ({{project.fields.name}})
+              </option>
+            {{/each}}
+          </select>
+          <p class="invalid-feedback">Please select a phone number to use.</p>
+          {{#if stealPhone}}
+            <p class="alert alert-danger mt-3">Note: People will no longer be able to call into {{projects.find(p => p.id === stealPhone).fields.name}} by phone.</p>
+          {{/if}}
+        </div>
+      {{elseif phoneType === 'new'}}
+        <label for="area-code"><h4>Enter a 3 digit U.S. area code you'd like for your new phone number:</h4></label>
+        <div class="row justify-content-center">
+          <div class="col-2">
+            <input type="text" class="form-control {{(invalid && !isThreeDigits(areaCode)) ? 'is-invalid' : ''}}"
+              id="area-code" bind:value="areaCode">
+            <p class="invalid-feedback">Please enter a valid 3 digit area code.</p>
+          </div>
+        </div>
+      {{/if}}
+    {{catch err}}
+      <p>Error determining existing projects.</p>
+    {{/await}}
+
 
     <button class="mt-3 btn btn-primary" on:click="createProject()">🚂 Create project</button>
   {{else}}
@@ -14,7 +64,11 @@
       <p>Creating project record … <Spinner/></p>
     {{else}}
       <p>Your new project, {{name}}, was successfully created! ✅</p>
-      <p>It was assigned the phone number {{humanPhone(project.fields.phone)}}.</p>
+      {{#if project.fields.phone}}
+        <p>It was assigned the phone number {{humanPhone(project.fields.phone)}}.</p>
+      {{else}}
+        <p>It has no phone number, either because you didn't assign one or because of an error.</p>
+      {{/if}}
       <p>Visit <Link to="/project/{{project.id}}">the project page</Link> to add prompts.</p>
     {{/if}}
   {{/if}}
@@ -34,18 +88,25 @@
 
   export default {
     components: { Link, Spinner },
-    helpers: { humanPhone },
+    helpers: {
+      humanPhone,
+      isThreeDigits: str => str.length === 3 && Number.isInteger(+str),
+    },
     methods: {
       createProject() {
-        const { name, description } = this.get();
-        if (!name) {
+        // eslint-disable-next-line object-curly-newline
+        const { name, description, phoneType, stealPhone, areaCode } = this.get();
+        if (!name || (phoneType === 'existing' && !stealPhone) || (phoneType === 'new' && !areaCode)) {
           this.set({ invalid: true });
           return;
         }
         this.set({ creating: true });
+        const reqBody = { name, description };
+        if (phoneType === 'existing') reqBody.stealPhone = stealPhone;
+        else if (phoneType === 'new') reqBody.areaCode = areaCode;
         fetch('/api/projects', {
           method: 'POST',
-          body: JSON.stringify({ name, description }),
+          body: JSON.stringify(reqBody),
           headers: new Headers({ 'Content-Type': 'application/json' }),
         }).then(res => res.json()).then((project) => {
           this.set({ project });
@@ -62,6 +123,9 @@
         invalid: false,
         project: null,
         creating: false,
+        phoneType: 'no',
+        stealPhone: '',
+        areaCode: '415',
       };
     },
   };

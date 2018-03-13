@@ -10,7 +10,7 @@
       {{#if !currentPrompts}}
         <Spinner/>
       {{else}}
-        <div>
+        <div class="mb-3">
           {{#each currentPrompts as prompt, i}}
             <div class="row mt-3">
               <div class="reorder">
@@ -29,9 +29,26 @@
           {{/each}}
         </div>
         {{#if promptsChanged}}
-          <button on:click="saveReorder()" class="btn btn-success mt-3">Save new prompt order</button>
+          <button on:click="saveReorder()" class="btn btn-success">Save new prompt order</button>
         {{else}}
           <UploadPrompt projectId="{{currentProject.id}}" index="{{currentPrompts.length}}" on:refreshPrompts/>
+          <div>
+            {{#if currentPrompts.length < 2 || showTips}}
+              <div class="alert alert-primary small text-left mt-3" transition:slide>
+              <p>
+                For phone calls, an automated voice after <em>only</em> the first prompt will briefly tell callers to leave a messsage at the beep and press the pound sign ("#") when they are done. The call will also stop recording and move to the next prompt if the caller is silent from more than 5 seconds.
+              </p>
+              <p>
+                The last "prompt" in your list won't actually give callers a chance to respond with a recording. Instead, it should be used for a goodbye message (e.g. "Thanks for calling! Listen for your voice in next week's show."). So make sure you have at least 2 prompts to actually gather audio.
+              </p>
+              <p>
+                Hover over the left side of the prompts to reorder them. Make sure to click "save" after you do this. Click on each prompt to see all the recordings gathered in response to it.
+              </p>
+            </div>
+            {{else}}
+              <button class="btn badge badge-warning" on:click="toggleTips()">Tips for adding new prompts</button>
+            {{/if}}
+          </div>
         {{/if}}
       {{/if}}
     </div>
@@ -71,12 +88,15 @@
 </style>
 
 <script>
+  import { slide } from 'svelte-transitions';
+
   import { humanIndex, humanPhone } from './util';
   import Spinner from './Spinner.html';
   import UploadPrompt from './UploadPrompt.html';
 
   export default {
     components: { Spinner, UploadPrompt },
+    transitions: { slide },
     computed: {
       name: currentProject => (currentProject ? currentProject.fields.name : ''),
     },
@@ -91,6 +111,7 @@
         currentPrompts: null,
         currentSubmissions: null,
         promptsChanged: false,
+        showTips: false,
       };
     },
     methods: {
@@ -109,6 +130,9 @@
         this.fire('refreshPrompts', { reorderedPrompts: this.get('currentPrompts') });
         // Spinner until parent confirms save
         this.set({ currentPrompts: null, promptsChanged: false });
+      },
+      toggleTips() {
+        this.set({ showTips: true });
       },
     },
   };

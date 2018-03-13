@@ -36,11 +36,12 @@ export default async function newProject(req, res) {
   const hostname = process.env.NOW_URL || `${req.protocol}://${req.hostname}`;
   // eslint-disable-next-line object-curly-newline
   const { name, description, areaCode, stealPhone } = req.body;
+  const safeName = name.replace('\'', '');
   let phone = '';
-  if (areaCode) phone = await newPhoneNumber(name, areaCode, hostname);
+  if (areaCode) phone = await newPhoneNumber(safeName, areaCode, hostname);
   else if (stealPhone) phone = await stealPhoneNumber(stealPhone);
   try {
-    const newProjectRecord = await db('projects').create({ name, description, phone });
+    const newProjectRecord = await db('projects').create({ safeName, description, phone });
     res.send(newProjectRecord._rawJson); // eslint-disable-line no-underscore-dangle
   } catch (err) {
     res.sendStatus(500);

@@ -3,10 +3,11 @@ import db from '../db';
 export default async function getPrompts(req, res) {
   const hostname = process.env.NOW_URL || `${req.protocol}://${req.hostname}`;
   const { projectName } = req.params;
+  const pName = projectName.replace('\'', '');
   try {
     while (true) { // eslint-disable-next-line no-await-in-loop
       const prompts = await db('prompts').select({
-        filterByFormula: `project='${projectName}'`,
+        filterByFormula: `project='${pName}'`,
         sort: [{ field: 'index', direction: 'asc' }],
       }).all();
       // Make sure we don't have any temp-serve URLs for audio.

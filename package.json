@@ -37,6 +37,7 @@
     "@google-cloud/speech": "^1.1.0",
     "@google-cloud/storage": "^1.6.0",
     "airtable": "^0.5.2",
+    "audio-recorder-polyfill": "github:alecglassford/audio-recorder-polyfill#bb7572a9cca8871a6652c6cb53fb5edca7f96269",
     "express": "^4.16.2",
     "multer": "^1.3.0",
     "twilio": "^3.13.0"

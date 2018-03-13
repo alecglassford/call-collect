@@ -1,15 +1,20 @@
 <button id="start-stop" class="{{state}}" on:click="startStop()">
   <span id="button-text">{{ stateSymbol }}</span>
 </button>
+{{#if state === 'loading'}}
+<p>Hold on.… <Spinner/></p>
+{{/if}}
+{{#if state === 'recording'}}
+<p>Recording.</p>
+{{/if}}
 {{#if audioBlob}}
   <audio src="{{audioBlobUrl}}" ref:player bind:currentTime bind:duration on:pause="pause()"></audio>
-  <!-- TK fix infinity -->
   <span>
     {{#if state === 'playing'}}{{Math.round(currentTime)}} / {{/if}}
     {{Math.round(duration)}} seconds
   </span>
-  <button class="btn" on:click="upload()">Submit recording</button>
-  <button class="btn" on:click="discard()">Discard recording</button>
+  <button class="btn btn-success" on:click="upload()">Submit recording</button>
+  <button class="btn btn-danger" on:click="discard()">Discard recording</button>
 {{/if}}
 
 <style>
@@ -57,23 +62,28 @@
 </style>
 
 <script>
+  import Recorder from 'audio-recorder-polyfill';
+
+  import Spinner from './Spinner.html';
+
   const startRecording = function startRecordingFunc() { // TK refactor
-    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-      const audioData = [];
-      const recorder = new MediaRecorder(stream);
-      recorder.ondataavailable = (ev) => {
-        audioData.push(ev.data);
-      };
-      recorder.onstop = () => {
-        const audioBlob = new Blob(audioData, { type: 'audio/webm' }); // TK wav, cross-platform
-        this.set({ audioBlob });
-        recorder.stream.getTracks().forEach((track) => {
-          track.stop();
-        });
-      };
-      recorder.start();
+    this.set({ state: 'loading' });
+    const audioData = [];
+    const recorder = new Recorder(null, { audio: true });
+    recorder.addEventListener('dataavailable', (ev) => {
+      audioData.push(ev.data);
+    });
+    recorder.addEventListener('stop', () => {
+      const audioBlob = new Blob(audioData, { type: 'audio/wav' });
+      this.set({ audioBlob });
+      recorder.stream.getTracks().forEach((track) => {
+        track.stop();
+      });
+      recorder.context.close();
+    });
+    recorder.start().then(() => {
       this.set({ state: 'recording', recorder });
-    }).catch(() => { // TK better error handling - use err msg
+    }).catch(() => {
       this.set({ state: 'error' });
     });
   };
@@ -90,6 +100,7 @@
   };
 
   export default {
+    components: { Spinner },
     data() {
       return {
         state: 'untouched',
@@ -101,10 +112,9 @@
     },
     computed: {
       stateSymbol(state) {
-        if (state === 'untouched') return '·';
-        if (state === 'recording') return '▪';
-        if (state === 'paused') return '▸';
-        return '‖'; // state === 'playing' TK better - bootstrap icon?
+        if (state === 'untouched' || state === 'loading') return '·';
+        if (state === 'recording' || state === 'playing') return '▪';
+        return '▸'; // if (state === 'paused')
       },
       audioBlobUrl: audioBlob => (audioBlob ? URL.createObjectURL(audioBlob) : null),
     },
@@ -118,7 +128,7 @@
       },
       pause() {
         this.refs.player.pause();
-        this.set({ state: 'paused' });
+        this.set({ state: 'paused', currentTime: 0 });
       },
       discard() {
         this.set({
@@ -128,6 +138,9 @@
           currentTime: null,
           duration: null,
         });
+      },
+      upload() {
+        console.log('tk');
       },
     },
   };

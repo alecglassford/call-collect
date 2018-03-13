@@ -5,10 +5,18 @@
     <label for="slug">Write a short slug for your prompt:</label>
     <input id="slug" type="text" bind:value="slug" class="form-control">
 
-    <label for="audio">Upload your prompt as a .wav file: </label>
-    <input id="audio" type="file" accept="audio/*" on:change="loadAudio(this.files[0])"
-      class="form-control form-control-file {{invalid?'is-invalid':''}}">
-    <p class="invalid-feedback">You must upload an audio file.</p>
+    <label for="audio">Upload your prompt as a .wav file:</label>
+
+    {{#if !audioBlob}}
+      <input id="audio" type="file" accept="audio/*" on:change="loadAudio(this.files[0])"
+        class="form-control form-control-file {{invalid?'is-invalid':''}}">
+      <p class="invalid-feedback">You must upload an audio file or record a prompt.</p>
+    {{/if}}
+
+    {{#if !file}}
+      <label for="recorder">Or record it right here:</label>
+      <div id="recorder"><Recorder ref:recorder bind:audioBlob/></div>
+    {{/if}}
 
     <button on:click="uploadPrompt()" class="btn btn-success mt-3">Submit slug and audio</button>
   </div>
@@ -17,10 +25,11 @@
 {{/if}}
 
 <script>
+  import Recorder from './Recorder.html';
   import Spinner from './Spinner.html';
 
   export default {
-    components: { Spinner },
+    components: { Recorder, Spinner },
     methods: {
       start() {
         this.set({ state: 'STARTED' });
@@ -29,12 +38,10 @@
         this.set({ file });
       },
       uploadPrompt() {
-        console.log('wut');
-        // eslint-disable-next-line object-curly-newline
-        const { projectId, index, slug, file } = this.get();
+        const { projectId, index, slug } = this.get();
+        const file = this.get('file') || this.refs.recorder.get('audioBlob');
         if (!file) {
           this.set({ invalid: true });
-          console.log('yo');
           return;
         }
         this.set({ state: 'UPLOADING' });
@@ -59,6 +66,7 @@
         index: -1, // this ... shouldn't happen
         slug: '',
         file: null,
+        audioBlob: null,
       };
     },
     oncreate() {

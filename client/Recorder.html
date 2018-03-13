@@ -1,58 +1,43 @@
-<button id="start-stop" class="{{state}}" on:click="startStop()">
-  <span id="button-text">{{ stateSymbol }}</span>
+<button id="start-stop"
+  class="btn btn-large rounded-circle {{state}}
+  {{state === 'paused' ? 'btn-outline-dark'
+    : (state === 'playing' ? 'btn-outline-success'
+    : 'btn-outline-danger')}}"
+  on:click="startStop()">
+  <span>{{{ stateSymbol }}}</span>
 </button>
+
 {{#if state === 'loading'}}
 <p>Hold on.… <Spinner/></p>
 {{/if}}
 {{#if state === 'recording'}}
 <p>Recording.</p>
 {{/if}}
+
 {{#if audioBlob}}
   <audio src="{{audioBlobUrl}}" ref:player bind:currentTime bind:duration on:pause="pause()"></audio>
   <span>
     {{#if state === 'playing'}}{{Math.round(currentTime)}} / {{/if}}
     {{Math.round(duration)}} seconds
   </span>
-  <button class="btn btn-success" on:click="upload()">Submit recording</button>
   <button class="btn btn-danger" on:click="discard()">Discard recording</button>
 {{/if}}
 
 <style>
-  #start-stop {
-    color: red;
-    border: 2px solid red;
-    border-radius: 50%;
-    font-size: 2em;
-    width: 1.5em;
-    height: 1.5em;
-    cursor: pointer;
-  }
-
-  #button-text {
+  #start-stop span {
     position: relative;
-    bottom: 0.02em; /* this is dumb */
+    bottom: 0.09em; /* this is dumb */
   }
 
   #start-stop.recording {
-    outline: none; /* TK a11y: tabbing messed up */
     border: none;
     border-top: 2px solid red;
     animation: spin 1s linear infinite;
   }
 
-  .recording #button-text {
+  #start-stop.recording span {
     display: inline-block;
     animation: spin 1s linear infinite reverse;
-  }
-
-  #start-stop.paused {
-    color: black;
-    border-color: black;
-  }
-
-  #start-stop.playing {
-    color: green;
-    border-color: green;
   }
 
   @keyframes spin {
@@ -62,9 +47,13 @@
 </style>
 
 <script>
+  import fontawesome from '@fortawesome/fontawesome';
+  import { faMicrophone, faPlay, faStop } from '@fortawesome/fontawesome-free-solid/shakable.es';
   import Recorder from 'audio-recorder-polyfill';
 
   import Spinner from './Spinner.html';
+
+  fontawesome.library.add(faMicrophone, faPlay, faStop);
 
   const startRecording = function startRecordingFunc() { // TK refactor
     this.set({ state: 'loading' });
@@ -111,10 +100,17 @@
       };
     },
     computed: {
+      // This instead of an if-block in template because Svelte can't remove
+      // font-awesome's craziness w/o just rewriting the inside of the node
       stateSymbol(state) {
-        if (state === 'untouched' || state === 'loading') return '·';
-        if (state === 'recording' || state === 'playing') return '▪';
-        return '▸'; // if (state === 'paused')
+        if (state === 'untouched' || state === 'loading') {
+          return '<i title="Click to record" class="fas fa-microphone"></i>';
+        }
+        if (state === 'recording' || state === 'playing') {
+          return '<i title="Click to stop" class="fas fa-stop"></i>';
+        }
+        // if (state === 'paused')
+        return '<i title="Click to play" class="fas fa-play"></i>';
       },
       audioBlobUrl: audioBlob => (audioBlob ? URL.createObjectURL(audioBlob) : null),
     },
@@ -138,9 +134,6 @@
           currentTime: null,
           duration: null,
         });
-      },
-      upload() {
-        console.log('tk');
       },
     },
   };

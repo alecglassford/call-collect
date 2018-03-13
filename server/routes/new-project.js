@@ -20,10 +20,15 @@ const newPhoneNumber = async function newPhoneNumberFunc(name, areaCode, hostnam
 };
 
 const stealPhoneNumber = async function stealPhoneNumberFunc(targetProjectId) {
-  const targetProject = await db('projects').find(targetProjectId);
-  const { phone } = targetProject.fields;
-  if (phone) await db('projects').update(targetProjectId, { phone: '' });
-  return phone;
+  try {
+    const targetProject = await db('projects').find(targetProjectId);
+    const { phone } = targetProject.fields;
+    if (phone) await db('projects').update(targetProjectId, { phone: '' });
+    return phone;
+  } catch (err) {
+    console.error('Error stealing phone number:', err);
+    return '';
+  }
 };
 
 export default async function newProject(req, res) {

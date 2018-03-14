@@ -15,7 +15,7 @@
 
     {{#if !file}}
       <label for="recorder">Or record it right here:</label>
-      <div id="recorder"><Recorder ref:recorder bind:audioBlob/></div>
+      <div id="recorder"><Recorder bind:audioBlob/></div>
     {{/if}}
 
     <button on:click="uploadPrompt()" class="btn btn-success mt-3">Submit slug and audio</button>
@@ -39,7 +39,7 @@
       },
       uploadPrompt() {
         const { projectId, index, slug } = this.get();
-        const file = this.get('file') || this.refs.recorder.get('audioBlob');
+        const file = this.get('file') || this.get('audioBlob');
         if (!file) {
           this.set({ invalid: true });
           return;

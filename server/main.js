@@ -19,10 +19,12 @@ const upload = multer({
   }),
 });
 
-// Widget routes
+// Widget/public routes
 app.use(express.static('widget/public'));
 app.get('/widget/:projectId', (req, res) => { res.sendFile(`${__dirname}/widget/index.html`); });
 app.get('/api/widget/:projectId', widgetData);
+app.post('/api/call/:index', express.urlencoded({ extended: true }), handleCall);
+app.get('/api/temp', tempServe);
 
 // Login routes
 app.get('/login', (req, res) => {
@@ -57,8 +59,6 @@ app.put('/api/prompts/:projectName', express.json(), reorderPrompts);
 app.get('/api/submissions/:projectName', getSubmissions);
 app.post('/api/projects', express.json(), newProject);
 app.post('/api/prompts', upload.single('promptAudio'), newPrompt);
-app.post('/api/call/:index', express.urlencoded({ extended: true }), handleCall);
-app.get('/api/temp', tempServe);
 
 // Catch everything else --> /api/... and /widget/... 404, others redirect home
 app.get('/api/*', (req, res) => { res.sendStatus(404); });

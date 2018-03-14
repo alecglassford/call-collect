@@ -11,6 +11,7 @@ import newPrompt from './routes/new-prompt';
 import handleCall from './routes/handle-call';
 import tempServe from './routes/temp-serve';
 import widgetData from './routes/widget-data';
+import uploadToWidget from './routes/upload-to-widget';
 
 const app = express();
 const upload = multer({
@@ -23,6 +24,7 @@ const upload = multer({
 app.use(express.static('widget/public'));
 app.get('/widget/:projectId', (req, res) => { res.sendFile(`${__dirname}/widget/index.html`); });
 app.get('/api/widget/:projectId', widgetData);
+app.post('/api/widget', upload.single('audio'), uploadToWidget);
 app.post('/api/call/:index', express.urlencoded({ extended: true }), handleCall);
 app.get('/api/temp', tempServe);
 

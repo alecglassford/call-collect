@@ -1,11 +1,46 @@
+<nav class="navbar navbar-expand-sm navbar-dark bg-primary">
+  <span class="navbar-brand">Call Collect</span>
+</nav>
 <div class="container-fluid">
-  <div class="row">
-    <div class="col">
+  <div class="row justify-content-center">
+    <div class="col-sm-6">
       {{#await projectProm}}
-        <Spinner/>
+        <div class="mt-3 text-center"><Spinner/></div>
       {{then project}}
-        TK {{project}}
-        <Recorder/>
+        <h1 class="h2">{{project.name}}</h1>
+        <p>{{project.desc}}</p>
+
+        {{#if !submitting}}
+          <div transition:fade>
+            {{#if index === 0}}
+              <p>We have {{project.prompts.length - 1}} short prompts for you to listen to. Click play below, then click the microphone to record your response.</p>
+              <p>Here's the first one:</p>
+            {{elseif index !== project.prompts.length - 1}}
+              <p>Thanks for sharing! Here's number {{index + 1}} out of {{project.prompts.length - 1}}:</p>
+            {{else}}
+              <p>Okay, that's everything. Thank you so much! Here's a short goodbye message if you have a second:</p>
+            {{/if}}
+
+            <h2 class="h4">{{project.prompts[index].slug}}</h2>
+            <div class="mt-3 mb-3">
+              <audio src="{{project.prompts[index].audio}}" controls></audio>
+            </div>
+
+            {{#if index !== project.prompts.length - 1}}
+              <p>Click the red button below to record. You can also share via voicemail by calling <a href="tel:{{project.phone}}">{{humanPhone(project.phone)}}</a>.</p>
+                <div class="text-center">
+                  <Recorder bind:audioBlob/>
+                </div>
+                {{#if audioBlob}}
+                  <button class="btn btn-primary mt-3" on:click="upload()">Submit</button>
+                {{/if}}
+            {{else}}
+              <p>👋</p>
+            {{/if}}
+          </div>
+        {{else}}
+          <div class="mt-3 text-center"><Spinner/></div>
+        {{/if}}
       {{catch err}}
         Error loading Call Collect widget.
       {{/await}}
@@ -14,17 +49,47 @@
 </div>
 
 <script>
+  import { fade } from 'svelte-transitions';
+
   import Recorder from '../client/Recorder.html';
   import Spinner from '../client/Spinner.html';
+  import { humanPhone } from '../client/util';
 
   const pathBits = window.location.pathname.split('/');
   const projectId = pathBits[2];
 
   export default {
     components: { Recorder, Spinner },
+    transitions: { fade },
+    helpers: { humanPhone },
+    methods: {
+      upload() {
+        this.set({ submitting: true });
+        const { index, audioBlob, contact } = this.get();
+        const fd = new FormData();
+        fd.append('contact', contact);
+        fd.append('projectId', projectId);
+        fd.append('index', index);
+        fd.append('audio', audioBlob);
+        fetch('/api/widget', {
+          method: 'POST',
+          body: fd,
+        }).then(() => {
+          this.set({
+            submitting: false,
+            audioBlob: null,
+            index: index + 1,
+          });
+        });
+      },
+    },
     data() {
       return {
         projectProm: fetch(`/api/widget/${projectId}`).then(res => res.json()),
+        index: 0,
+        audioBlob: null,
+        submitting: false,
+        contact: 'TK email address',
       };
     },
   };

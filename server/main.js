@@ -19,7 +19,7 @@ const upload = multer({
 });
 
 app.get('/login', (req, res) => {
-  res.sendFile(`${__dirname}/public/login.html`);
+  res.sendFile(`${__dirname}/client/login.html`);
 });
 app.post('/login', express.json(), (req, res) => {
   if (req.body.PASSPHRASE === process.env.PASSPHRASE) {

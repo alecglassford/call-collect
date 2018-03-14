@@ -52,6 +52,7 @@
         fd.append('promptAudio', file);
         fetch('/api/prompts', {
           method: 'POST',
+          credentials: 'same-origin',
           body: fd,
         }).then(() => {
           this.fire('refreshPrompts', {});

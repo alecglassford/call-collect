@@ -16,7 +16,9 @@
 
   const fetchPrompts = function fetchPromptsFunc() {
     const name = this.get('uriName');
-    fetch(`/api/prompts/${name}`).then(res => res.json())
+    fetch(`/api/prompts/${name}`, {
+      credentials: 'same-origin',
+    }).then(res => res.json())
       .then((currentPrompts) => {
         this.set({ currentPrompts });
         this.set({ originalOrder: currentPrompts.map(p => p.id) });
@@ -25,7 +27,9 @@
 
   const fetchSubmissions = function fetchSubmissionsFunc() {
     const name = this.get('uriName');
-    fetch(`/api/submissions/${name}`).then(res => res.json())
+    fetch(`/api/submissions/${name}`, {
+      credentials: 'same-origin',
+    }).then(res => res.json())
       .then((currentSubmissions) => {
         this.set({ currentSubmissions });
       });
@@ -67,6 +71,7 @@
         const name = this.get('uriName');
         fetch(`/api/prompts/${name}`, {
           method: 'PUT',
+          credentials: 'same-origin',
           body: JSON.stringify(changed),
           headers: new Headers({ 'Content-Type': 'application/json' }),
         }).then(res => res.json()).then((currentPrompts) => {

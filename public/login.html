@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Call Collect - Login</title>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@4/dist/css/bootstrap.min.css">
+    <style>
+      .bg-primary {
+        background-color: #85C1E9 !important;
+      }
+      .btn-primary {
+        background-color: #85C1E9;
+        border-color: #85C1E9;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-sm navbar-dark bg-primary mb-3">
+      <a href="/login" class="navbar-brand">Call Collect</a>
+    </nav>
+    <div class="container-fluid">
+      <form id="login-form" class="row justify-content-center">
+        <div class="col-sm-8">
+          <div class="form-group">
+            <label for="passphrase"><h1>Enter your team's passphrase to access Call Collect.</h1></label>
+            <input id="passphrase" class="form-control form-control-lg" type="text" placeholder="Your team's shared passphrase">
+          </div>
+          <button type="submit" class="form-group btn btn-primary">🔓 Submit</button>
+          <p id="wrong" class="alert alert-danger d-none">Wrong.</p>
+        </div>
+      </form>
+    </div>
+    <script>
+      /* eslint-disable */
+      window.onload = function main() {
+        document.getElementById('login-form').onsubmit = function handleSubmit(ev) {
+          ev.preventDefault();
+          fetch('/login', {
+            method: 'POST',
+            credentials: 'same-origin',
+            body: JSON.stringify({
+              PASSPHRASE: document.getElementById('passphrase').value,
+            }),
+            headers: new Headers({ 'Content-Type': 'application/json' }),
+          }).then(function handleResponse(res) {
+            if (res.ok) {
+              window.location.href = '/';
+            } else {
+              document.getElementById('wrong').classList.remove('d-none');
+            }
+          });
+        };
+      };
+    </script>
+  </body>
+</html>

@@ -106,12 +106,15 @@
         else if (phoneType === 'new') reqBody.areaCode = areaCode;
         fetch('/api/projects', {
           method: 'POST',
+          credentials: 'same-origin',
           body: JSON.stringify(reqBody),
           headers: new Headers({ 'Content-Type': 'application/json' }),
         }).then(res => res.json()).then((project) => {
           this.set({ project });
           this.store.set({
-            projectList: fetch('/api/projects').then(res => res.json()),
+            projectList: fetch('/api/projects', {
+              credentials: 'same-origin',
+            }).then(res => res.json()),
           });
         });
       },

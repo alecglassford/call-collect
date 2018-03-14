@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import express from 'express';
 import multer from 'multer';
 
@@ -15,6 +16,29 @@ const upload = multer({
   storage: multer.diskStorage({
     destination: '/tmp/cc-tmp-storage', // TK make more flexible?
   }),
+});
+
+app.get('/login', (req, res) => {
+  res.sendFile(`${__dirname}/public/login.html`);
+});
+app.post('/login', express.json(), (req, res) => {
+  if (req.body.PASSPHRASE === process.env.PASSPHRASE) {
+    const encodedPass = encodeURIComponent(req.body.PASSPHRASE);
+    res.set('Set-Cookie', `PASSPHRASE=${encodedPass}`);
+    res.sendStatus(200);
+  } else {
+    res.sendStatus(403);
+  }
+});
+
+app.use(cookieParser());
+app.use((req, res, next) => {
+  if (req.cookies.PASSPHRASE !== process.env.PASSPHRASE) {
+    if (req.path.startsWith('/api/')) res.sendStatus(403);
+    else res.redirect('/login');
+  } else {
+    next();
+  }
 });
 
 app.use(express.static('public'));

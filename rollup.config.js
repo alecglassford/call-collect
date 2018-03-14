@@ -37,6 +37,33 @@ export default [
       include: 'client/**',
     },
   },
+  { // Rollup the Widget
+    input: 'widget/main.js',
+    output: {
+      sourcemap: true,
+      format: 'iife',
+      file: 'widget/public/bundle-widget.js',
+      name: 'widget',
+    },
+    plugins: [
+      svelte({
+        dev: !production,
+        css: (css) => {
+          css.write('widget/public/bundle-widget.css');
+        },
+        store: false,
+        cascade: false,
+      }),
+      resolve(),
+      commonjs(),
+      replace({ 'process.env.NODE_ENV': '"production"' }),
+      production && buble({ exclude: 'node_modules/**' }),
+      production && uglify(),
+    ],
+    watch: {
+      include: 'widget/**',
+    },
+  },
   { // Rollup the Express server
     input: './server/main.js',
     output: {

@@ -1,0 +1,31 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col">
+      {{#await projectProm}}
+        <Spinner/>
+      {{then project}}
+        TK {{project}}
+        <Recorder/>
+      {{catch err}}
+        Error loading Call Collect widget.
+      {{/await}}
+    </div>
+  </div>
+</div>
+
+<script>
+  import Recorder from '../client/Recorder.html';
+  import Spinner from '../client/Spinner.html';
+
+  const pathBits = window.location.pathname.split('/');
+  const projectId = pathBits[2];
+
+  export default {
+    components: { Recorder, Spinner },
+    data() {
+      return {
+        projectProm: fetch(`/api/widget/${projectId}`).then(res => res.json()),
+      };
+    },
+  };
+</script>

@@ -1,5 +1,6 @@
 server.js*
 public/bundle.*
+widget/public/bundle*
 .DS_Store
 _notes/
 

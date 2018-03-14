@@ -10,6 +10,7 @@ import newProject from './routes/new-project';
 import newPrompt from './routes/new-prompt';
 import handleCall from './routes/handle-call';
 import tempServe from './routes/temp-serve';
+import widgetData from './routes/widget-data';
 
 const app = express();
 const upload = multer({
@@ -18,6 +19,12 @@ const upload = multer({
   }),
 });
 
+// Widget routes
+app.use(express.static('widget/public'));
+app.get('/widget/:projectId', (req, res) => { res.sendFile(`${__dirname}/widget/index.html`); });
+app.get('/api/widget/:projectId', widgetData);
+
+// Login routes
 app.get('/login', (req, res) => {
   res.sendFile(`${__dirname}/client/login.html`);
 });
@@ -31,11 +38,13 @@ app.post('/login', express.json(), (req, res) => {
   }
 });
 
+// Authentication - every route after here requires PASSPHRASE cookie
 app.use(cookieParser());
 app.use((req, res, next) => {
   if (req.cookies.PASSPHRASE !== process.env.PASSPHRASE) {
-    if (req.path.startsWith('/api/')) res.sendStatus(403);
-    else res.redirect('/login');
+    if (req.path.startsWith('/api/') || req.path.startsWith('/widget/')) {
+      res.sendStatus(403);
+    } else res.redirect('/login');
   } else {
     next();
   }
@@ -50,6 +59,10 @@ app.post('/api/projects', express.json(), newProject);
 app.post('/api/prompts', upload.single('promptAudio'), newPrompt);
 app.post('/api/call/:index', express.urlencoded({ extended: true }), handleCall);
 app.get('/api/temp', tempServe);
+
+// Catch everything else --> /api/... and /widget/... 404, others redirect home
+app.get('/api/*', (req, res) => { res.sendStatus(404); });
+app.get('/widget/*', (req, res) => { res.sendStatus(404); });
 app.get('/*', (req, res) => { res.sendFile(`${__dirname}/public/index.html`); });
 
 app.listen(process.env.PORT || 3000, () => {

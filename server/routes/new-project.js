@@ -41,7 +41,7 @@ export default async function newProject(req, res) {
   if (areaCode) phone = await newPhoneNumber(safeName, areaCode, hostname);
   else if (stealPhone) phone = await stealPhoneNumber(stealPhone);
   try {
-    const newProjectRecord = await db('projects').create({ safeName, description, phone });
+    const newProjectRecord = await db('projects').create({ name: safeName, description, phone });
     res.send(newProjectRecord._rawJson); // eslint-disable-line no-underscore-dangle
   } catch (err) {
     res.sendStatus(500);

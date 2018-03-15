@@ -3,7 +3,7 @@ import db from '../db';
 // audio has been saved to req.file.path
 // and we have req.body.projectId, req.body.index
 export default async function newPrompt(req, res) {
-  const hostname = process.env.NOW_URL || `${req.protocol}://${req.hostname}`;
+  const hostname = `${req.protocol}://${req.hostname}`;
   const { index, slug, projectId } = req.body;
   const filePath = encodeURIComponent(req.file.path);
   const fileMime = encodeURIComponent(req.file.mimetype);

@@ -2,7 +2,7 @@ import db from '../db';
 import transcribe from '../transcribe-submission';
 
 const saveAndTranscribe = async function saveAndTranscribeFunc(req) {
-  const hostname = process.env.NOW_URL || `${req.protocol}://${req.hostname}`;
+  const hostname = `${req.protocol}://${req.hostname}`;
   const { contact, projectId, promptId } = req.body;
   const filePath = encodeURIComponent(req.file.path);
   const fileMime = encodeURIComponent(req.file.mimetype);

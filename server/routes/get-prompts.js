@@ -28,7 +28,7 @@ export const cleanPrompts = async function cleanPromptsFunc(pName, hostname) {
 };
 
 export default async function getPrompts(req, res) {
-  const hostname = process.env.NOW_URL || `${req.protocol}://${req.hostname}`;
+  const hostname = `${req.protocol}://${req.hostname}`;
   const { projectName } = req.params;
   const pName = projectName.replace('\'', '');
   const prompts = await cleanPrompts(pName, hostname);

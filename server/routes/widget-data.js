@@ -4,7 +4,7 @@ import { cleanPrompts } from './get-prompts';
 
 
 export default async function widgetData(req, res) {
-  const hostname = process.env.NOW_URL || `${req.protocol}://${req.hostname}`;
+  const hostname = `${req.protocol}://${req.hostname}`;
   const { projectId } = req.params;
 
   const project = await db('projects').find(projectId);

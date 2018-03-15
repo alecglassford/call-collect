@@ -33,7 +33,7 @@ const stealPhoneNumber = async function stealPhoneNumberFunc(targetProjectId) {
 
 export default async function newProject(req, res) {
   // error handling TK
-  const hostname = process.env.NOW_URL || `${req.protocol}://${req.hostname}`;
+  const hostname = `${req.protocol}://${req.hostname}`;
   // eslint-disable-next-line object-curly-newline
   const { name, description, areaCode, stealPhone } = req.body;
   const safeName = name.replace('\'', '');

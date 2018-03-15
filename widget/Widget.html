@@ -17,7 +17,7 @@
         {{#if !submitting}}
           <div transition:fade>
             {{#if index === 0}}
-              <p>We have {{numActualPrompts}} short prompts for you to listen to. Click play below, then click the microphone to record your response.</p>
+              <p>We have {{numActualPrompts}} short prompt{{numAcutalPrompts > 1 ? 's' : ''}} for you to listen and respond to.</p>
 
               {{#if needContact}}
                 <form id="contact" on:submit="saveContact(event)" transition:fade>
@@ -45,7 +45,8 @@
                 </div>
 
                 {{#if index !== numActualPrompts}}
-                  <p>Click the red button below to record. You can also share via voicemail by calling <a href="tel:{{project.phone}}">{{humanPhone(project.phone)}}</a>.</p>
+                  <h6>Listen to the prompt above, then click the red button below to record your response</h6>
+                  <p>Or leave a voicemail at <a href="tel:{{project.phone}}">{{humanPhone(project.phone)}}</a> instead.</p>
                     <div class="text-center">
                       <Recorder bind:audioBlob/>
                     </div>

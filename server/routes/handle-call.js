@@ -59,7 +59,7 @@ const saveRecording = async function saveRecordingFunc(caller, audio, project, i
         prompt: [prompt.id],
       });
     console.log(`Saved a recording to ${submission.id}.`);
-    transcribe(submission.id);
+    transcribe(submission);
   } catch (err) {
     console.error(`Failed to save recording with caller ${caller}, audio ${audio}, projectId ${projectId}, index ${index}:`);
     console.error(err);

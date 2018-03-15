@@ -52,18 +52,43 @@ if (process.env.GOOGLE_CREDS_STRING === undefined) {
     console.log('updated db with a final');
   };
 
-  transcribe = async function transcribeSubmission(submissionId) {
+  // Airtable may not have our audio yet, so we'll retry until we get it.
+  const noTempAudio = async function noTempAudioFunc(submission, count) {
+    const audioUrl = submission.fields.widget_audio[0].url; // dl.airtable.com/...
+    if (audioUrl.includes('/api/temp?filepath=')) { // TK better test
+      if (count > 10) throw new Error('Failed to get Airtable audio.'); // TK better msg
+
+      await new Promise((resolve) => { setTimeout(resolve, 10000); });
+      const newSub = await db('submissions').find(submission.id);
+      return noTempAudio(newSub, count + 1);
+    }
+    return audioUrl;
+  };
+
+  const submissionToBucket = async function submissionToBucketFunc(submission, bucket) {
+    let audioUrl = submission.fields.audio; // correct if submitted by phone
+
+    if (submission.fields.widget_audio) { // if uploaded by widget, change
+      // Airtable has been somewhat dubious so I'm going to say wait a whole
+      // 30 seconds right now to make sure the whole file is getting uploaded.
+      await new Promise((resolve) => { setTimeout(resolve, 30000); });
+      audioUrl = await noTempAudio(submission, 0);
+    }
+
+    await bucket.upload(audioUrl);
+    return basename(audioUrl);
+  };
+
+  transcribe = async function transcribeSubmission(submission) {
+    const submissionId = submission.id;
     console.log(submissionId);
     try {
       const bucket = await bucketPromise; // should be resolved by now, probably
-      const submission = await db('submissions').find(submissionId);
-      await bucket.upload(submission.fields.audio);
-      const gcsFilename = basename(submission.fields.audio);
+      const gcsFilename = await submissionToBucket(submission, bucket);
 
       const prelimResult = await sc.longRunningRecognize({
         config: {
           encoding: 'LINEAR16',
-          sampleRateHertz: 8000, // :( Twilio recording limitation
           languageCode: 'en-US', // TK allow other languages
           maxAlternatives: 1, // TK change this?
           profanityFilter: false,

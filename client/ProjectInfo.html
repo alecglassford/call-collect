@@ -2,6 +2,9 @@
   <div class="narrow mx-auto">
     <h2 class="display-4 serif">{{name}}</h2>
     {{#if currentProject.fields.description}}<p>{{currentProject.fields.description}}</p>{{/if}}
+    {{#if currentSubmissions}}
+      <p>This project has received {{currentSubmissions.length}} submissions so far.</p>
+    {{/if}}
     {{#if showCollect}}
       <div class="alert alert-primary alert-dismissible text-left" transition:slide>
         <h3 class="h5">Share these around to collect calls</h3>
@@ -13,40 +16,45 @@
         <button on:click="hideCollect()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
     {{/if}}
-    {{#if currentSubmissions}}
-    <p>This project has received {{currentSubmissions.length}} submissions.</p>
-    {{/if}}
     {{#if !currentPrompts}}
       <div class="text-center"><Spinner/></div>
     {{else}}
       <div class="mb-3">
-        {{#each currentPrompts as prompt, i}}
-          <div class="row mt-3 prompt-row">
-            <div class="reorder">
-              <button on:click="up(i)">⬆️</button>
-              {{#if i !== currentPrompts.length - 1}}<button on:click="down(i)">⬇️</button>{{/if}}
-            </div>
-            <h4 class="col-sm-6 text-left">
-              <Link to="{{`/project/${currentProject.id}/prompt/${prompt.id}`}}">
-                {{#if prompt.fields.slug}}
-                  {{prompt.fields.slug}}
-                {{else}}
-                  Prompt {{humanIndex(prompt.fields.index)}}
+        {{#if enabledPrompts && enabledPrompts.length}}
+          <h3>Active Prompts</h3>
+          {{#each enabledPrompts as prompt, i}}
+            <div class="row mt-3 prompt-row">
+              <div class="reorder">
+                <button class="{{i === 0 ? 'invisible' : ''}}" on:click="up(i)">⬆️</button>
+                {{#if i !== enabledPrompts.length - 1}}<button on:click="down(i)">⬇️</button>{{/if}}
+              </div>
+              <h4 class="col-sm-6 text-left">
+                <Link to="{{`/project/${currentProject.id}/prompt/${prompt.id}`}}">
+                  {{#if prompt.fields.slug}}
+                    {{prompt.fields.slug}}
+                  {{else}}
+                    Prompt {{humanIndex(prompt.fields.index)}}
+                  {{/if}}
+                  <small class="text-muted">{{countSubs(prompt, currentSubmissions)}} submissions so far</small>
+                </Link>
+              </h4>
+              <div class="col-sm-1">
+                {{#if !promptsChanged}}
+                  <button class="btn badge badge-secondary mb-1" on:click="disable(prompt)">Disable</button>
                 {{/if}}
-                <small class="text-muted">{{countSubs(prompt, currentSubmissions)}} submissions so far</small>
-              </Link>
-            </h4>
-            <audio controls src="{{audioUrl(prompt)}}" class="col-sm-6"></audio>
-          </div>
-        {{/each}}
+              </div>
+              <audio controls src="{{audioUrl(prompt)}}" class="col-sm-5"></audio>
+            </div>
+          {{/each}}
+        {{/if}}
       </div>
       <div class="text-center">
         {{#if promptsChanged}}
           <button on:click="saveReorder()" class="btn btn-success">Save new prompt order</button>
         {{else}}
-          <UploadPrompt projectId="{{currentProject.id}}" index="{{currentPrompts.length}}" on:refreshPrompts/>
+          <UploadPrompt projectId="{{currentProject.id}}" index="{{enabledPrompts.length}}" on:refreshPrompts/>
           <div>
-            {{#if currentPrompts.length < 2 || showTips}}
+            {{#if enabledPrompts.length < 2 || showTips}}
               <div class="alert alert-primary alert-dismissible small text-left mt-3" transition:slide>
               <p>
                 For phone calls, an automated voice after <em>only</em> the first prompt will briefly tell callers to leave a messsage at the beep and press the pound sign ("#") when they are done. The call will also stop recording and move to the next prompt if the caller is silent from more than 5 seconds.
@@ -57,7 +65,7 @@
               <p>
                 Hover over the left side of the prompts to reorder them. Make sure to click "save" after you do this. Click on each prompt to see all the recordings gathered in response to it.
               </p>
-              {{#if currentPrompts.length >= 2}}
+              {{#if enabledPrompts.length >= 2}}
                 <button on:click="toggleTips()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
               {{/if}}
             </div>
@@ -67,6 +75,29 @@
           </div>
         {{/if}}
       </div>
+      {{#if disabledPrompts && disabledPrompts.length}}
+        <h5 class="text-muted mt-3">Disabled Prompts</h5>
+        {{#each disabledPrompts as prompt}}
+          <div class="row">
+            <strong class="col-sm-6 text-left">
+              <Link to="{{`/project/${currentProject.id}/prompt/${prompt.id}`}}" className="text-muted">
+                {{#if prompt.fields.slug}}
+                  {{prompt.fields.slug}}
+                {{else}}
+                  Prompt {{humanIndex(prompt.fields.index)}}
+                {{/if}}
+                <small class="text-muted">{{countSubs(prompt, currentSubmissions)}} submissions so far</small>
+              </Link>
+            </strong>
+            <div class="col-sm-1">
+              {{#if !promptsChanged}}
+                <button class="btn badge badge-primary mb-1" on:click="enable(prompt)">Enable</button>
+              {{/if}}
+            </div>
+            <audio controls src="{{audioUrl(prompt)}}" class="col-sm-5"></audio>
+          </div>
+        {{/each}}
+      {{/if}}
     {{/if}}
   </div>
 {{/if}}
@@ -100,9 +131,12 @@
     font-size: 0.5em;
   }
 
-  /* hides up arrow for first prompt */
-  div:first-child > .reorder > button:first-child {
+  /* disable prompt button */
+  .prompt-row .badge {
     visibility: hidden;
+  }
+  .prompt-row:hover .badge {
+    visibility: visible;
   }
 </style>
 
@@ -120,6 +154,14 @@
     computed: {
       name: currentProject => (currentProject ? currentProject.fields.name : ''),
       widgetUrl: currentProject => (currentProject ? `${window.location.origin}/widget/${currentProject.id}` : ''),
+      enabledPrompts(currentPrompts) {
+        if (!currentPrompts) return null;
+        return currentPrompts.filter(p => p.fields.index >= 0);
+      },
+      disabledPrompts(currentPrompts) {
+        if (!currentPrompts) return null;
+        return currentPrompts.filter(p => p.fields.index === -1);
+      },
     },
     helpers: {
       audioUrl: prompt => prompt.fields.audio[0].url,
@@ -138,17 +180,20 @@
         promptsChanged: false,
         showTips: false,
         showCollect: true,
+        uriName: null,
       };
     },
     methods: {
       up(i) {
-        const currentPrompts = this.get('currentPrompts');
-        [currentPrompts[i - 1], currentPrompts[i]] = [currentPrompts[i], currentPrompts[i - 1]];
+        const { currentPrompts, enabledPrompts } = this.get();
+        const j = i + (currentPrompts.length - enabledPrompts.length);
+        [currentPrompts[j - 1], currentPrompts[j]] = [currentPrompts[j], currentPrompts[j - 1]];
         this.set({ currentPrompts, promptsChanged: true });
       },
       down(i) {
-        const currentPrompts = this.get('currentPrompts');
-        [currentPrompts[i + 1], currentPrompts[i]] = [currentPrompts[i], currentPrompts[i + 1]];
+        const { currentPrompts, enabledPrompts } = this.get();
+        const j = i + (currentPrompts.length - enabledPrompts.length);
+        [currentPrompts[j + 1], currentPrompts[j]] = [currentPrompts[j], currentPrompts[j + 1]];
         this.set({ currentPrompts, promptsChanged: true });
       },
       saveReorder() {
@@ -163,6 +208,40 @@
       },
       hideCollect() {
         this.set({ showCollect: false });
+      },
+      disable(prompt) {
+        const prompts = this.get('enabledPrompts');
+        if (!prompts) return; // noop
+        const changed = [[prompt.id, -1]]; // Set index to -1
+        // Decrement index of all subsequent prompts
+        for (let i = prompt.fields.index + 1; i < prompts.length; i += 1) {
+          changed.push([prompts[i].id, i - 1]);
+        }
+        const name = this.get('uriName');
+        // TK this and refreshPrompts do a redundant request
+        fetch(`/api/prompts/${name}`, {
+          method: 'PUT',
+          credentials: 'same-origin',
+          body: JSON.stringify(changed),
+          headers: new Headers({ 'Content-Type': 'application/json' }),
+        }).then(() => { this.fire('refreshPrompts', {}); });
+        // Spinner until done
+        this.set({ currentPrompts: null });
+      },
+      enable(prompt) {
+        const numEnabled = this.get('enabledPrompts').length;
+        // Add it to the end of enabled
+        const changed = [[prompt.id, numEnabled]];
+        // Tk refactor with disable
+        const name = this.get('uriName');
+        fetch(`/api/prompts/${name}`, {
+          method: 'PUT',
+          credentials: 'same-origin',
+          body: JSON.stringify(changed),
+          headers: new Headers({ 'Content-Type': 'application/json' }),
+        }).then(() => { this.fire('refreshPrompts', {}); });
+        // Spinner until done
+        this.set({ currentPrompts: null });
       },
     },
   };

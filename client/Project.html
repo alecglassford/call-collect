@@ -3,7 +3,7 @@
 </:Head>
 
 <Route exact path="/project/:slug">
-  <ProjectInfo :currentProject :currentPrompts :currentSubmissions on:refreshPrompts="refreshPrompts(event)"/>
+  <ProjectInfo :currentProject :currentPrompts :currentSubmissions :uriName on:refreshPrompts="refreshPrompts(event)"/>
   <Submissions :currentProject :currentPrompts :currentSubmissions/>
 </Route>
 <Route exact path="/project/:slug/prompt/:promptId" bind:match="promptMatch">
@@ -120,8 +120,9 @@
         }
         const changed = [];
         const [old, reordered] = [this.get('originalOrder'), ev.reorderedPrompts];
+        const numDisabled = reordered.filter(p => p.fields.index === -1).length;
         for (let i = 0; i < old.length; i += 1) {
-          if (old[i] !== reordered[i].id) changed.push([reordered[i].id, i]);
+          if (old[i] !== reordered[i].id) changed.push([reordered[i].id, i - numDisabled]);
         }
         const name = this.get('uriName');
         fetch(`/api/prompts/${name}`, {

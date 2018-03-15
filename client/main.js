@@ -7,6 +7,7 @@ const store = new Store({
   projectList: fetch('/api/projects', {
     credentials: 'same-origin',
   }).then(res => res.json()),
+  breadcrumb: null,
 });
 window.store = store; // TK only for dev
 

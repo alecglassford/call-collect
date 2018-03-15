@@ -1,0 +1,83 @@
+<:Head>
+  <title>Call Collect{{ready ? ` - ${currentProject.fields.name} - ${title}` : ''}}</title>
+</:Head>
+
+<div class="narrow mx-auto">
+  {{#if !ready}}
+    <div class="mt-3 text-center"><Spinner/></div>
+  {{else}}
+    <h2 class="display-4 serif">{{title}}</h2>
+    {{#if drillPrompt}}
+      <audio src="{{drillPrompt.fields.audio[0].url}}" controls></audio>
+    {{/if}}
+    <p>There are {{submissions.length}} submissions.</p>
+
+    {{#each submissions as sub}}
+      <div class="row border-top pt-2">
+        <div class="col-sm-4">
+          {{#if drillCaller}}
+            <p>In response to <Link to="{{`/project/${currentProject.id}/prompt/${sub.fields.prompt[0]}`}}">{{subToPromptName(sub, currentPrompts)}}</Link></p>
+          {{else}}
+            <p>From <Link to="{{`/project/${currentProject.id}/caller/${encodeURIComponent(sub.fields.caller)}`}}">{{humanPhone(sub.fields.caller)}}</Link></p>
+          {{/if}}
+          <p>{{new Date(sub.fields.timestamp).toLocaleString()}}</p>
+        </div>
+        <div class="col-sm-8">
+          <audio src="{{sub.fields.widget_audio? sub.fields.widget_audio[0].url : sub.fields.audio}}" controls></audio>
+          <p>
+            {{#if sub.fields.transcript}}
+              {{sub.fields.transcript}}
+            {{else}}
+              No transcript available.
+            {{/if}}
+          </p>
+        </div>
+      </div>
+    {{/each}}
+  {{/if}}
+</div>
+
+<script>
+  import Link from 'svelte-routing/Link.html';
+
+  import Spinner from './Spinner.html';
+  import { humanPhone } from './util';
+
+  export default {
+    components: { Link, Spinner },
+    data() {
+      return {
+        currentProject: null,
+        currentPrompts: null,
+        currentSubmissions: null,
+        drillCaller: null,
+        drillPrompt: null,
+      };
+    },
+    computed: {
+      ready(currentProject, currentPrompts, currentSubmissions, drillCaller, drillPrompt) {
+        if (!currentProject || !currentSubmissions) return false;
+        if ((drillCaller && currentPrompts) || drillPrompt) return true;
+        return false;
+      },
+      title(ready, drillCaller, drillPrompt) {
+        if (!ready) return null;
+        if (drillCaller) return humanPhone(drillCaller);
+        return drillPrompt.fields.slug || `Prompt ${drillPrompt.fields.index + 1}`;
+      },
+      submissions(ready, currentSubmissions, drillCaller, drillPrompt) {
+        if (!ready) return null;
+        if (drillCaller) return currentSubmissions.filter(s => s.fields.caller === drillCaller);
+        return currentSubmissions.filter(s => s.fields.prompt[0] === drillPrompt.id);
+      },
+    },
+    helpers: {
+      humanPhone,
+      subToPromptName(sub, currentPrompts) {
+        const promptId = sub.fields.prompt[0];
+        const prompt = currentPrompts.find(p => p.id === promptId);
+        return prompt.fields.slug || `Prompt ${prompt.fields.index + 1}`;
+      },
+    },
+  };
+</script>

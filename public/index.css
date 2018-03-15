@@ -4,6 +4,10 @@ body {
   min-height: 100vh;
 }
 
+.narrow {
+  max-width: 720px;
+}
+
 /* TK compile all this into Bootstrap? */
 
 .bg-primary {

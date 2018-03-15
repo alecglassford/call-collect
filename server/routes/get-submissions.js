@@ -7,8 +7,7 @@ export default async function getSubmissions(req, res) {
     const submissions = await db('submissions').select({
       filterByFormula: `project='${pName}'`,
       sort: [
-        { field: 'timestamp', direction: 'asc' },
-        { field: 'prompt', direction: 'asc' },
+        { field: 'timestamp', direction: 'desc' },
       ],
     }).all();
     res.json(submissions.map(s => s._rawJson)); // eslint-disable-line no-underscore-dangle

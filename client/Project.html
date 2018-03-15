@@ -1,7 +1,19 @@
-<ProjectInfo :currentProject :currentPrompts :currentSubmissions on:refreshPrompts="refreshPrompts(event)"/>
-<Submissions :currentProject :currentPrompts :currentSubmissions/>
+<Route exact path="/project/:slug">
+  <ProjectInfo :currentProject :currentPrompts :currentSubmissions on:refreshPrompts="refreshPrompts(event)"/>
+  <Submissions :currentProject :currentPrompts :currentSubmissions/>
+</Route>
+<Route exact path="/project/:slug/prompt/:promptId" bind:match="promptMatch">
+  <Drilldown :currentProject :currentSubmissions :drillPrompt/>
+</Route>
+<Route exact path="/project/:slug/caller/:caller" bind:match="callerMatch">
+  <Drilldown :currentProject :currentPrompts :currentSubmissions :drillCaller/>
+</Route>
+
 
 <script>
+  import Route from 'svelte-routing/Route.html';
+
+  import Drilldown from './Drilldown.html';
   import ProjectInfo from './ProjectInfo.html';
   import Submissions from './Submissions.html';
 
@@ -36,13 +48,16 @@
   };
 
   export default {
-    components: { ProjectInfo, Submissions },
+    // eslint-disable-next-line object-curly-newline
+    components: { Drilldown, ProjectInfo, Route, Submissions },
     data() {
       return {
         currentProject: null,
         currentPrompts: null,
         originalOrder: null, // array of promptIds
         currentSubmissions: null,
+        // promptMatch: null, --> causes bug on loading URL directly
+        // callerMatch: null, --> Svelte will warn, but that's better
       };
     },
     computed: {
@@ -50,12 +65,35 @@
         if (!currentProject || currentProject === 'new') return null;
         return encodeURIComponent(currentProject.fields.name);
       },
+      drillPrompt(currentPrompts, promptMatch) {
+        if (!currentPrompts || !promptMatch) return null;
+        return currentPrompts.find(p => p.id === promptMatch.params.promptId);
+      },
+      drillCaller: callerMatch => (callerMatch ? decodeURIComponent(callerMatch.params.caller) : ''),
+      breadcrumb(currentProject) {
+        if (!currentProject) return null;
+        return [currentProject.fields.name, `/project/${currentProject.id}`];
+      },
     },
     oncreate() {
       fetchProject.call(this).then(() => {
         fetchPrompts.call(this);
         fetchSubmissions.call(this);
       });
+
+      const updateBreadcrumb = () => {
+        if (!this.get('drillCaller') && !(this.get('drillPrompt'))) {
+          this.store.set({ breadcrumb: null });
+        } else {
+          this.store.set({ breadcrumb: this.get('breadcrumb') });
+        }
+      };
+      this.observe('drillCaller', updateBreadcrumb);
+      this.observe('drillPrompt', updateBreadcrumb);
+      updateBreadcrumb();
+    },
+    ondestroy() {
+      this.store.set({ breadcrumb: null });
     },
     methods: {
       refreshPrompts(ev) {

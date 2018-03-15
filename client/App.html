@@ -1,10 +1,10 @@
 <nav class="navbar navbar-expand-sm navbar-dark bg-primary mb-3">
-  <Link exact to="/" className="navbar-brand">Call Collect</Link>
+  <Link to="/" className="navbar-brand">Call Collect</Link>
   <div class="collapse navbar-collapse">
     <ul class="navbar-nav">
-      {{#each breadcrumbs as [text, href]}}
-        <li class="nav-item"><Link to="{{href}}" className="nav-link">{{text}}</Link></li>
-      {{/each}}
+      {{#if $breadcrumb}}
+        <li class="nav-item"><Link to="{{$breadcrumb[1]}}" className="nav-link">{{$breadcrumb[0]}}</Link></li>
+      {{/if}}
     </ul>
   </div>
 </nav>

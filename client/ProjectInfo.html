@@ -1,43 +1,45 @@
 {{#if currentProject}}
-  <div id="project-info" class="row mx-auto">
-    <div class="col-12 text-center">
-      <h2 class="display-4 serif">{{name}}</h2>
-      {{#if currentProject.fields.description}}<p>{{currentProject.fields.description}}</p>{{/if}}
-      {{#if showCollect}}
-        <div class="alert alert-primary alert-dismissible text-left" transition:slide>
-          <h3 class="h5">Collecting calls <small class="text-muted">Here's where to send your listeners.</small></h3>
-          <p>
-            <strong>Phone</strong>: {{humanPhone(currentProject.fields.phone)}}<br>
-            <strong>Web</strong>: <a href="{{widgetUrl}}">{{widgetUrl}}</a><br>
-            <strong>Embed code</strong> <small>(e.g. for your website's sidebar)</small>:</p>
-          <textarea class="form-control form-control-sm small" rows="1" on:click="event.target.select()">&lt;iframe src=&quot;{{widgetUrl}}&quot; width=&quot;100%&quot; height=&quot;600&quot; frameborder=&quot;0&quot; allow=&quot;microphone&quot;&gt;&lt;/iframe&gt;</textarea>
-          <button on:click="hideCollect()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        </div>
-      {{/if}}
-      {{#if currentSubmissions}}
-      <p>This project has received {{currentSubmissions.length}} submissions.</p>
-      {{/if}}
-      {{#if !currentPrompts}}
-        <Spinner/>
-      {{else}}
-        <div class="mb-3">
-          {{#each currentPrompts as prompt, i}}
-            <div class="row mt-3">
-              <div class="reorder">
-                <button on:click="up(i)">⬆️</button>
-                {{#if i !== currentPrompts.length - 1}}<button on:click="down(i)">⬇️</button>{{/if}}
-              </div>
-              <h4 class="col-sm-6 text-left">
+  <div class="narrow mx-auto">
+    <h2 class="display-4 serif">{{name}}</h2>
+    {{#if currentProject.fields.description}}<p>{{currentProject.fields.description}}</p>{{/if}}
+    {{#if showCollect}}
+      <div class="alert alert-primary alert-dismissible text-left" transition:slide>
+        <h3 class="h5">Collecting calls <small class="text-muted">Here's where to send your listeners.</small></h3>
+        <p>
+          <strong>Phone</strong>: {{humanPhone(currentProject.fields.phone)}}<br>
+          <strong>Web</strong>: <a href="{{widgetUrl}}">{{widgetUrl}}</a><br>
+          <strong>Embed code</strong> <small>(e.g. for your website's sidebar)</small>:</p>
+        <textarea class="form-control form-control-sm small" rows="1" on:click="event.target.select()">&lt;iframe src=&quot;{{widgetUrl}}&quot; width=&quot;100%&quot; height=&quot;600&quot; frameborder=&quot;0&quot; allow=&quot;microphone&quot;&gt;&lt;/iframe&gt;</textarea>
+        <button on:click="hideCollect()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+    {{/if}}
+    {{#if currentSubmissions}}
+    <p>This project has received {{currentSubmissions.length}} submissions.</p>
+    {{/if}}
+    {{#if !currentPrompts}}
+      <div class="text-center"><Spinner/></div>
+    {{else}}
+      <div class="mb-3">
+        {{#each currentPrompts as prompt, i}}
+          <div class="row mt-3 prompt-row">
+            <div class="reorder">
+              <button on:click="up(i)">⬆️</button>
+              {{#if i !== currentPrompts.length - 1}}<button on:click="down(i)">⬇️</button>{{/if}}
+            </div>
+            <h4 class="col-sm-6 text-left">
+              <Link to="{{`/project/${currentProject.id}/prompt/${prompt.id}`}}">
                 {{#if prompt.fields.slug}}
                   {{prompt.fields.slug}}
                 {{else}}
                   Prompt {{humanIndex(prompt.fields.index)}}
                 {{/if}}
-              </h4>
-              <audio controls src="{{audioUrl(prompt)}}" class="col-sm-6"></audio>
-            </div>
-          {{/each}}
-        </div>
+              </Link>
+            </h4>
+            <audio controls src="{{audioUrl(prompt)}}" class="col-sm-6"></audio>
+          </div>
+        {{/each}}
+      </div>
+      <div class="text-center">
         {{#if promptsChanged}}
           <button on:click="saveReorder()" class="btn btn-success">Save new prompt order</button>
         {{else}}
@@ -63,21 +65,20 @@
             {{/if}}
           </div>
         {{/if}}
-      {{/if}}
-    </div>
+      </div>
+    {{/if}}
   </div>
 {{/if}}
 
 <style>
-  #project-info {
-    max-width: 720px;
-  }
-
   .alert a {
     overflow-wrap: break-word;
   }
 
   /*** reorder buttons ***/
+  .prompt-row {
+    position: relative;
+  }
 
   .reorder {
     visibility:hidden;
@@ -105,6 +106,7 @@
 </style>
 
 <script>
+  import Link from 'svelte-routing/Link.html';
   import { slide } from 'svelte-transitions';
 
   import { humanIndex, humanPhone } from './util';
@@ -112,7 +114,7 @@
   import UploadPrompt from './UploadPrompt.html';
 
   export default {
-    components: { Spinner, UploadPrompt },
+    components: { Link, Spinner, UploadPrompt },
     transitions: { slide },
     computed: {
       name: currentProject => (currentProject ? currentProject.fields.name : ''),

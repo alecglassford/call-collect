@@ -1,3 +1,4 @@
+import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import multer from 'multer';
@@ -14,6 +15,7 @@ import widgetData from './routes/widget-data';
 import uploadToWidget from './routes/upload-to-widget';
 
 const app = express();
+app.use(compression());
 const upload = multer({
   storage: multer.diskStorage({
     destination: '/tmp/cc-tmp-storage', // TK make more flexible?

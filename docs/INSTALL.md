@@ -10,7 +10,7 @@ Call Collect relies on several other Internet services—to store your data, han
 
 This setup webpage **does not store any of the private information** you input! It just combines the keys you provide by running some code in your web browser, on your own computer, and then sends them to a service [Zeit Now](https://zeit.co/now) that will create and host your new web server. *Always be wary of sharing sensitive info like keys.*
 
-The setup process should take you 5-20 minutes total, depending on whether you already have accounts for some of the services. **You don't need any special technical expertise to do this setup!** I know that working with various web services and signing up for new accounts can be intimidating/annoying, but I really hope that this guide makes it as painless as possible. If you run into issues, please feel free to leave a message [through this form](https://github.com/alecglassford/call-collect/issues/new) if you have a GitHub account, or [over email](mailto:glassford@cs.stanford.edu).
+The setup process should take you 10-30 minutes total, depending on whether you already have accounts for some of the services. **You don't need any special technical expertise to do this setup!** I know that working with various web services and signing up for new accounts can be intimidating/annoying, but I really hope that this guide makes it as painless as possible. If you run into issues, please feel free to leave a message [through this form](https://github.com/alecglassford/call-collect/issues/new) if you have a GitHub account, or [over email](mailto:glassford@cs.stanford.edu).
 
 Ready? Here we go!
 
@@ -76,7 +76,7 @@ Here's what you need to do:
 
 2. [Go to the Speech API page.](https://console.cloud.google.com/apis/library/speech.googleapis.com) The name of your new project should be in the blue bar at the top of the page; if it isn't, you may have to wait a minute or so for it to finish getting created (refresh …). Click the blue "Enable" button to turn on the speech service. If you haven't added a credit card to your account, you'll be directed to "enable billing." Do that, then try this step again, making sure that you see a green checkmark and "API enabled."
 
-3. [Go to the Google Cloud Storage page](https://console.cloud.google.com/storage) and enable Storage as well.
+3. [Go to the Google Cloud Storage page](https://console.cloud.google.com/storage) and enable Storage as well. It may actually be enabled by default, so if you see a pretty bare page with buttons that say "Create bucket" and "Take the quickstart" you don't have to do anything.
 
 4. Okay, here's the most convoluted part! After this, it's all downhill. Ready? [Go to the credentials page.](https://console.cloud.google.com/apis/credentials), make sure your project is active (in the blue bar at the top), and click "Create credentials" then select "Service account key." Use the "Service account" dropdown to create a new service account. Name it whatever you want (e.g. `call-collect-user`) and from the "Role" dropdown, scroll all the way to the bottom, hover over "Storage" and choose "Storage Admin." What we're doing here is selecting some permissions to give to Call Collect, so it's able to do all the things it needs with your Google account but no more.
 

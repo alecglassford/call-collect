@@ -29,7 +29,7 @@ const buildInstructions = function buildInstructionsFunc() {
 };
 
 const buildDeployList = function buildDeployListFunc() {
-  const filenames = glob.sync('@(client|server|public)/**/!(bundle)*', { nodir: true });
+  const filenames = glob.sync('@(client|server|public|widget)/**/!(bundle)*', { nodir: true });
   filenames.push('package.json', 'package-lock.json', 'rollup.config.js', 'LICENSE.txt');
   fs.writeFileSync(deployListFilename, JSON.stringify(filenames));
   console.log('Built deploy list.');

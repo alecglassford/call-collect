@@ -15,6 +15,7 @@ export default async function widgetData(req, res) {
     desc: project.fields.description,
     phone: project.fields.phone,
     prompts: prompts.map(p => ({
+      id: p.id,
       slug: p.fields.slug,
       audio: p.fields.audio[0].url,
     })),

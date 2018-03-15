@@ -4,16 +4,16 @@
 <div class="container-fluid">
   <div class="row justify-content-center">
     <div class="col-sm-6">
-      {{#await projectProm}}
+      {{#if !project}}
         <div class="mt-3 text-center"><Spinner/></div>
-      {{then project}}
+      {{else}}
         <h1 class="h2">{{project.name}}</h1>
         <p>{{project.desc}}</p>
 
         {{#if !submitting}}
           <div transition:fade>
             {{#if index === 0}}
-              <p>We have {{project.prompts.length - 1}} short prompts for you to listen to. Click play below, then click the microphone to record your response.</p>
+              <p>We have {{numActualPrompts}} short prompts for you to listen to. Click play below, then click the microphone to record your response.</p>
 
               {{#if needContact}}
                 <form id="contact" on:submit="saveContact(event)" transition:fade>
@@ -27,8 +27,8 @@
                 <p>Thanks! Here's the first prompt:</p>
               {{/if}}
 
-            {{elseif index !== project.prompts.length - 1}}
-              <p>Thanks for sharing! Here's number {{index + 1}} out of {{project.prompts.length - 1}}:</p>
+            {{elseif index !== numActualPrompts}}
+              <p>Thanks for sharing! Here's number {{index + 1}} out of {{numActualPrompts}}:</p>
             {{else}}
               <p>Okay, that's everything. Thank you so much! Here's a short goodbye message if you have a second:</p>
             {{/if}}
@@ -40,7 +40,7 @@
                   <audio src="{{project.prompts[index].audio}}" controls></audio>
                 </div>
 
-                {{#if index !== project.prompts.length - 1}}
+                {{#if index !== numActualPrompts}}
                   <p>Click the red button below to record. You can also share via voicemail by calling <a href="tel:{{project.phone}}">{{humanPhone(project.phone)}}</a>.</p>
                     <div class="text-center">
                       <Recorder bind:audioBlob/>
@@ -57,9 +57,7 @@
         {{else}}
           <div class="mt-3 text-center"><Spinner/></div>
         {{/if}}
-      {{catch err}}
-        Error loading Call Collect widget.
-      {{/await}}
+      {{/if}}
     </div>
   </div>
 </div>
@@ -85,11 +83,12 @@
       },
       upload() {
         this.set({ submitting: true });
-        const { index, audioBlob, contact } = this.get();
+        // eslint-disable-next-line object-curly-newline
+        const { project, index, audioBlob, contact } = this.get();
         const fd = new FormData();
         fd.append('contact', contact);
         fd.append('projectId', projectId);
-        fd.append('index', index);
+        fd.append('promptId', project.prompts[index].id);
         fd.append('audio', audioBlob);
         fetch('/api/widget', {
           method: 'POST',
@@ -103,15 +102,25 @@
         });
       },
     },
+    oncreate() {
+      fetch(`/api/widget/${projectId}`)
+        .then(res => res.json())
+        .then((project) => {
+          this.set({ project });
+        });
+    },
     data() {
       return {
-        projectProm: fetch(`/api/widget/${projectId}`).then(res => res.json()),
+        project: null,
         index: 0,
         audioBlob: null,
         submitting: false,
         contact: '',
         needContact: true,
       };
+    },
+    computed: {
+      numActualPrompts: project => (project ? project.prompts.length - 1 : null),
     },
   };
 </script>

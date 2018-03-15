@@ -25,7 +25,7 @@
     "build-docs": "node docs/_build.js",
     "build": "rollup -c",
     "dev": "nodemon -r dotenv/config -r source-map-support/register server.js --watch server.js & rollup -c -w",
-    "start": "node server.js",
+    "start": "node server.js > /dev/null 2>&1",
     "test": "eslint --ext .html,.js server/ client/"
   },
   "husky": {

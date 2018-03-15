@@ -1,3 +1,7 @@
+<:Head>
+  <title>{{titleTag}}</title>
+</:Head>
+
 <Route exact path="/project/:slug">
   <ProjectInfo :currentProject :currentPrompts :currentSubmissions on:refreshPrompts="refreshPrompts(event)"/>
   <Submissions :currentProject :currentPrompts :currentSubmissions/>
@@ -16,6 +20,7 @@
   import Drilldown from './Drilldown.html';
   import ProjectInfo from './ProjectInfo.html';
   import Submissions from './Submissions.html';
+  import { humanPhone } from './util';
 
   const fetchProject = function fetchProjectFunc() {
     const { slug } = this.get('match').params;
@@ -73,6 +78,18 @@
       breadcrumb(currentProject) {
         if (!currentProject) return null;
         return [currentProject.fields.name, `/project/${currentProject.id}`];
+      },
+      titleTag(currentProject, drillCaller, drillPrompt) {
+        let result = 'Call Collect';
+        if (currentProject) {
+          result += ` - ${currentProject.fields.name}`;
+          if (drillCaller) result += ` - ${humanPhone(drillCaller)}`;
+          else if (drillPrompt) {
+            if (drillPrompt.fields.slug) result += ` - ${drillPrompt.fields.slug}`;
+            else result += ` - Prompt ${drillPrompt.fields.index + 1}`;
+          }
+        }
+        return result;
       },
     },
     oncreate() {

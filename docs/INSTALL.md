@@ -120,4 +120,6 @@ A couple of last things before we get this show on the road:
 
 ## Deploy!
 
-When you're ready to go, click this button and we'll try to make you wonderful little thing on the Internet: <button id="deploy">Make it.</button>
+When you're ready to go, click this button and we'll try to make you wonderful little thing on the Internet:
+
+<button class="btn btn-success btn-large btn-block" id="deploy">Make it.</button>

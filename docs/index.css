@@ -1,11 +1,7 @@
 #wrapper {
   max-width: 600px;
   width: 90%;
-  margin: 0 auto;
-}
-
-h1, h2, h3, .user-input {
-  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  margin: 1em auto;
 }
 
 .user-input {
@@ -22,4 +18,9 @@ h1, h2, h3, .user-input {
 .user-input.filled {
   background-color: palegreen;
   transition: background-color 1s ease;
+}
+
+.btn-success {
+  background-color: palegreen;
+  color: black;
 }

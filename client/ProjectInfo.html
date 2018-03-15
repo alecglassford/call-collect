@@ -4,7 +4,7 @@
     {{#if currentProject.fields.description}}<p>{{currentProject.fields.description}}</p>{{/if}}
     {{#if showCollect}}
       <div class="alert alert-primary alert-dismissible text-left" transition:slide>
-        <h3 class="h5">Collecting calls <small class="text-muted">Here's where to send your listeners.</small></h3>
+        <h3 class="h5">Share these around to collect calls</h3>
         <p>
           <strong>Phone</strong>: {{humanPhone(currentProject.fields.phone)}}<br>
           <strong>Web</strong>: <a href="{{widgetUrl}}">{{widgetUrl}}</a><br>
@@ -33,6 +33,7 @@
                 {{else}}
                   Prompt {{humanIndex(prompt.fields.index)}}
                 {{/if}}
+                <small class="text-muted">{{countSubs(prompt, currentSubmissions)}} submissions so far</small>
               </Link>
             </h4>
             <audio controls src="{{audioUrl(prompt)}}" class="col-sm-6"></audio>
@@ -124,6 +125,10 @@
       audioUrl: prompt => prompt.fields.audio[0].url,
       humanIndex,
       humanPhone,
+      countSubs(prompt, currentSubmissions) {
+        if (!currentSubmissions) return 0;
+        return currentSubmissions.filter(s => s.fields.prompt[0] === prompt.id).length;
+      },
     },
     data() {
       return {

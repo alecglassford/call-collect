@@ -9,12 +9,13 @@ export default async function widgetData(req, res) {
 
   const project = await db('projects').find(projectId);
   const prompts = await cleanPrompts(project.fields.name, hostname);
+  const enabledPrompts = prompts.filter(p => p.fields.index !== -1);
 
   res.json({
     name: project.fields.name,
     desc: project.fields.description,
     phone: project.fields.phone,
-    prompts: prompts.map(p => ({
+    prompts: enabledPrompts.map(p => ({
       id: p.id,
       slug: p.fields.slug,
       audio: p.fields.audio[0].url,

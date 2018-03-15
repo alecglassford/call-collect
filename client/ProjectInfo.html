@@ -2,8 +2,18 @@
   <div id="project-info" class="row mx-auto">
     <div class="col-12 text-center">
       <h2 class="display-4 serif">{{name}}</h2>
-      <h3>{{humanPhone(currentProject.fields.phone)}}</h3>
       {{#if currentProject.fields.description}}<p>{{currentProject.fields.description}}</p>{{/if}}
+      {{#if showCollect}}
+        <div class="alert alert-primary alert-dismissible text-left" transition:slide>
+          <h3 class="h5">Collecting calls <small class="text-muted">Here's where to send your listeners.</small></h3>
+          <p>
+            <strong>Phone</strong>: {{humanPhone(currentProject.fields.phone)}}<br>
+            <strong>Web</strong>: <a href="{{widgetUrl}}">{{widgetUrl}}</a><br>
+            <strong>Embed code</strong> <small>(e.g. for your website's sidebar)</small>:</p>
+          <textarea class="form-control form-control-sm small" rows="1" on:click="event.target.select()">&lt;iframe src=&quot;{{widgetUrl}}&quot; width=&quot;100%&quot; height=&quot;600&quot; frameborder=&quot;0&quot; allow=&quot;microphone&quot;&gt;&lt;/iframe&gt;</textarea>
+          <button on:click="hideCollect()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+      {{/if}}
       {{#if currentSubmissions}}
       <p>This project has received {{currentSubmissions.length}} submissions.</p>
       {{/if}}
@@ -34,7 +44,7 @@
           <UploadPrompt projectId="{{currentProject.id}}" index="{{currentPrompts.length}}" on:refreshPrompts/>
           <div>
             {{#if currentPrompts.length < 2 || showTips}}
-              <div class="alert alert-primary small text-left mt-3" transition:slide>
+              <div class="alert alert-primary alert-dismissible small text-left mt-3" transition:slide>
               <p>
                 For phone calls, an automated voice after <em>only</em> the first prompt will briefly tell callers to leave a messsage at the beep and press the pound sign ("#") when they are done. The call will also stop recording and move to the next prompt if the caller is silent from more than 5 seconds.
               </p>
@@ -44,9 +54,12 @@
               <p>
                 Hover over the left side of the prompts to reorder them. Make sure to click "save" after you do this. Click on each prompt to see all the recordings gathered in response to it.
               </p>
+              {{#if currentPrompts.length >= 2}}
+                <button on:click="toggleTips()" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              {{/if}}
             </div>
             {{else}}
-              <button class="btn badge badge-warning" on:click="toggleTips()">Tips for adding new prompts</button>
+              <button class="btn badge badge-secondary" on:click="toggleTips()">Tips for adding new prompts</button>
             {{/if}}
           </div>
         {{/if}}
@@ -58,6 +71,10 @@
 <style>
   #project-info {
     max-width: 720px;
+  }
+
+  .alert a {
+    overflow-wrap: break-word;
   }
 
   /*** reorder buttons ***/
@@ -99,6 +116,7 @@
     transitions: { slide },
     computed: {
       name: currentProject => (currentProject ? currentProject.fields.name : ''),
+      widgetUrl: currentProject => (currentProject ? `${window.location.origin}/widget/${currentProject.id}` : ''),
     },
     helpers: {
       audioUrl: prompt => prompt.fields.audio[0].url,
@@ -112,6 +130,7 @@
         currentSubmissions: null,
         promptsChanged: false,
         showTips: false,
+        showCollect: true,
       };
     },
     methods: {
@@ -132,7 +151,11 @@
         this.set({ currentPrompts: null, promptsChanged: false });
       },
       toggleTips() {
-        this.set({ showTips: true });
+        const showTips = this.get('showTips');
+        this.set({ showTips: !showTips });
+      },
+      hideCollect() {
+        this.set({ showCollect: false });
       },
     },
   };

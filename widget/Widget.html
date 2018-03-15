@@ -1,7 +1,11 @@
+<:Head>
+  <title>Call Collect {{project ? `- ${project.name}` : ''}}</title>
+</:Head>
+
 <nav class="navbar navbar-expand-sm navbar-dark bg-primary">
   <span class="navbar-brand">Call Collect</span>
 </nav>
-<div class="container-fluid">
+<div class="container-fluid mt-3">
   <div class="row justify-content-center">
     <div class="col-sm-6">
       {{#if !project}}

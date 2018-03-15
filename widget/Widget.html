@@ -14,28 +14,44 @@
           <div transition:fade>
             {{#if index === 0}}
               <p>We have {{project.prompts.length - 1}} short prompts for you to listen to. Click play below, then click the microphone to record your response.</p>
-              <p>Here's the first one:</p>
+
+              {{#if needContact}}
+                <form id="contact" on:submit="saveContact(event)" transition:fade>
+                    <div class="form-group">
+                      <label for="passphrase">First, could you tell us your email address or phone number in case we want to follow up?</label>
+                      <input class="form-control" type="text" bind:value="contact">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Okay</button>
+                </form>
+              {{else}}
+                <p>Thanks! Here's the first prompt:</p>
+              {{/if}}
+
             {{elseif index !== project.prompts.length - 1}}
               <p>Thanks for sharing! Here's number {{index + 1}} out of {{project.prompts.length - 1}}:</p>
             {{else}}
               <p>Okay, that's everything. Thank you so much! Here's a short goodbye message if you have a second:</p>
             {{/if}}
 
-            <h2 class="h4">{{project.prompts[index].slug}}</h2>
-            <div class="mt-3 mb-3">
-              <audio src="{{project.prompts[index].audio}}" controls></audio>
-            </div>
-
-            {{#if index !== project.prompts.length - 1}}
-              <p>Click the red button below to record. You can also share via voicemail by calling <a href="tel:{{project.phone}}">{{humanPhone(project.phone)}}</a>.</p>
-                <div class="text-center">
-                  <Recorder bind:audioBlob/>
+            {{#if !needContact}}
+              <div transition:fade="{delay:400}">
+                <h2 class="h4">{{project.prompts[index].slug}}</h2>
+                <div class="mt-3 mb-3">
+                  <audio src="{{project.prompts[index].audio}}" controls></audio>
                 </div>
-                {{#if audioBlob}}
-                  <button class="btn btn-primary mt-3" on:click="upload()">Submit</button>
+
+                {{#if index !== project.prompts.length - 1}}
+                  <p>Click the red button below to record. You can also share via voicemail by calling <a href="tel:{{project.phone}}">{{humanPhone(project.phone)}}</a>.</p>
+                    <div class="text-center">
+                      <Recorder bind:audioBlob/>
+                    </div>
+                    {{#if audioBlob}}
+                      <button class="btn btn-primary mt-3" on:click="upload()">Submit</button>
+                    {{/if}}
+                {{else}}
+                  <p>👋</p>
                 {{/if}}
-            {{else}}
-              <p>👋</p>
+              </div>
             {{/if}}
           </div>
         {{else}}
@@ -63,6 +79,10 @@
     transitions: { fade },
     helpers: { humanPhone },
     methods: {
+      saveContact(ev) {
+        ev.preventDefault();
+        if (this.get('contact')) this.set({ needContact: false });
+      },
       upload() {
         this.set({ submitting: true });
         const { index, audioBlob, contact } = this.get();
@@ -89,7 +109,8 @@
         index: 0,
         audioBlob: null,
         submitting: false,
-        contact: 'TK email address',
+        contact: '',
+        needContact: true,
       };
     },
   };

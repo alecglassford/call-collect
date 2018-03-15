@@ -96,7 +96,7 @@ This will be totally free. Here's what you need to do:
 
 1. [Create a Zeit account, or login if you already have one.](https://zeit.co/login)
 
-2. [Go to the tokens page in your account settings.](https://zeit.co/account/tokens) Type "call-collect" (or any other memorable name) into the box that says "Create a new token by entering its name…" and hit enter. It should show up in the list above. Click "reveal" next to your new token and copy the "Secret" string of text that shows up (it should look like `oDGiEsH7irIvB5871buaVMzs`) and paste it into the box below:
+2. [Go to the tokens page in your account settings.](https://zeit.co/account/tokens) Type "call-collect" (or any other memorable name) into the box that says "Create a new token by entering its name…" and hit enter. It should show up in the list above. Click "copy" next to your new token (or click "reveal" then copy the "Secret" string of text that shows up, which should look like `oDGiEsH7irIvB5871buaVMzs`). Paste it into the box below:
 
     <p class="user-input">🗝 Your Zeit Now token: <input id="now-token" type="text"></p>
 

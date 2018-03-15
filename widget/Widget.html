@@ -41,7 +41,7 @@
               <div transition:fade="{delay:400}">
                 <h2 class="h4">{{project.prompts[index].slug}}</h2>
                 <div class="mt-3 mb-3">
-                  <audio src="{{project.prompts[index].audio}}" controls></audio>
+                  <audio src="{{project.prompts[index].audio}}" controls controlsList="nodownload"></audio>
                 </div>
 
                 {{#if index !== numActualPrompts}}
@@ -97,13 +97,10 @@
         fetch('/api/widget', {
           method: 'POST',
           body: fd,
-        }).then(() => {
-          this.set({
-            submitting: false,
-            audioBlob: null,
-            index: index + 1,
+        }).then(() => new Promise((resolve) => { setTimeout(resolve, 500); })) // Svelte bug?
+          .then(() => {
+            this.set({ submitting: false, audioBlob: null, index: index + 1 });
           });
-        });
       },
     },
     oncreate() {

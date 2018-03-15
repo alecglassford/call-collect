@@ -7,7 +7,7 @@
     <label style="float: right">Search transcripts <input type="text" bind:value="search"></label>
     {{#if organize === 'prompt'}}
       {{#each currentPrompts as prompt}}
-        <h3>Submissions for {{prompt.fields.slug || `$prompt {humanIndex(prompt.fields.index)}`}}</h3>
+        <h3>Submissions for {{prompt.fields.slug || `prompt ${humanIndex(prompt.fields.index)}`}}</h3>
         <table>
           <thead>
             <tr>
@@ -22,9 +22,8 @@
               <tr transition:fly='{y: 200, duration: 1000}'>
                 <td class="timestamp">{{new Date(submission.fields.timestamp).toLocaleString()}}</td>
                 <td class="caller">{{humanPhone(submission.fields.caller)}}</td>
-                <!-- <td><audio controls preload="metadata" src="{{submission.fields.audio}}"></audio></td> -->
                 <td class="audio">
-                  <span class="soundcite" data-url="{{submission.fields.audio}}" data-plays="1">
+                  <span class="soundcite" data-url="{{submission.fields.widget_audio? submission.fields.widget_audio[0].url : submission.fields.audio}}" data-plays="1">
                     {{#if submission.fields.transcript}}
                       {{submission.fields.transcript}}
                     {{else}}
@@ -55,9 +54,8 @@
               <tr transition:fly='{y: 200, duration: 1000}'>
                 <td class="timestamp">{{new Date(submission.fields.timestamp).toLocaleString()}}</td>
                 <td class="caller">{{promptIdToSlug(submission.fields.prompt[0], currentPrompts)}}</td>
-                <!-- <td><audio controls preload="metadata" src="{{submission.fields.audio}}"></audio></td> -->
                 <td class="audio">
-                  <span class="soundcite" data-url="{{submission.fields.audio}}" data-plays="1">
+                  <span class="soundcite"  data-url="{{submission.fields.widget_audio? submission.fields.widget_audio[0].url : submission.fields.audio}}"  data-plays="1">
                     {{#if submission.fields.transcript}}
                       {{submission.fields.transcript}}
                     {{else}}

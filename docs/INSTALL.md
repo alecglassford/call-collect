@@ -10,7 +10,7 @@ Call Collect relies on several other Internet services—to store your data, han
 
 This setup webpage **does not store any of the private information** you input! It just combines the keys you provide by running some code in your web browser, on your own computer, and then sends them to a service [Zeit Now](https://zeit.co/now) that will create and host your new web server. *Always be wary of sharing sensitive info like keys.*
 
-The setup process should take you 5-20 minutes total, depending on whether you already have accounts for some of the services. **You don't need any special technical expertise to do this setup!** I know that working with various web services and signing up for new accounts can be intimidating/annoying, but I really hope that this guide makes it as painless as possible. If you run into issues, please feel free to leave a message [through this form](https://github.com/alecglassford/cc2/issues/new) if you have a GitHub account, or [over email](mailto:glassford@cs.stanford.edu).
+The setup process should take you 5-20 minutes total, depending on whether you already have accounts for some of the services. **You don't need any special technical expertise to do this setup!** I know that working with various web services and signing up for new accounts can be intimidating/annoying, but I really hope that this guide makes it as painless as possible. If you run into issues, please feel free to leave a message [through this form](https://github.com/alecglassford/call-collect/issues/new) if you have a GitHub account, or [over email](mailto:glassford@cs.stanford.edu).
 
 Ready? Here we go!
 
@@ -84,7 +84,7 @@ Here's what you need to do:
 
   <p class="user-input">🗝 Your Google key file: <input id="google-creds" type="file" accept=".json"></p>
 
-  *Please know that the file is not actually getting uploaded anywhere, just loaded into your web browser so we can deploy it to your new Call Collect instance. I promise I'm not saving any of your sensitive information, and I encourage you to view the source of this page and [the code of the project more generally](https://github.com/alecglassford/cc2) to verify this!!!*
+  *Please know that the file is not actually getting uploaded anywhere, just loaded into your web browser so we can deploy it to your new Call Collect instance. I promise I'm not saving any of your sensitive information, and I encourage you to view the source of this page and [the code of the project more generally](https://github.com/alecglassford/call-collect) to verify this!!!*
 
 5. You're done! 🎉
 

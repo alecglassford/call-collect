@@ -1,18 +1,18 @@
 {
-  "name": "cc2",
+  "name": "call-collect",
   "version": "0.0.1",
   "private": true,
   "description": "TK",
   "keywords": [
     "TK"
   ],
-  "homepage": "https://github.com/alecglassford/cc2#readme",
+  "homepage": "https://github.com/alecglassford/call-collect#readme",
   "bugs": {
-    "url": "https://github.com/alecglassford/cc2/issues"
+    "url": "https://github.com/alecglassford/call-collect/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/alecglassford/cc2.git"
+    "url": "https://github.com/alecglassford/call-collect.git"
   },
   "license": "Apache-2.0",
   "author": {

@@ -3,7 +3,7 @@
 
 /* eslint-env browser */
 
-var deployFilesBase = 'https://raw.githubusercontent.com/alecglassford/cc2/master/';
+var deployFilesBase = 'https://raw.githubusercontent.com/alecglassford/call-collect/master/';
 
 var getDeployFiles = function getDeployFilesFunc() {
   return fetch('deploy-files.json')

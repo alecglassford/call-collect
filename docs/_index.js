@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-const deployFilesBase = 'https://raw.githubusercontent.com/alecglassford/cc2/master/';
+const deployFilesBase = 'https://raw.githubusercontent.com/alecglassford/call-collect/master/';
 
 const getDeployFiles = function getDeployFilesFunc() {
   return fetch('deploy-files.json')

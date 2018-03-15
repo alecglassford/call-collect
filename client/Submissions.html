@@ -1,178 +1,60 @@
-<div>
+<div class="table-responsive">
   {{#if !currentProject || !currentSubmissions || !currentPrompts}}
     Loading submissions.
+  {{elseif currentSubmissions.length === 0}}
+    <h3>No submissions yet.</h3>
   {{else}}
-    <label><input type="radio" bind:group="organize" value='prompt' checked>Group by prompt</label>
-    <label><input type="radio" bind:group="organize" value='caller'>Group by caller</label>
-    <label style="float: right">Search transcripts <input type="text" bind:value="search"></label>
-    {{#if organize === 'prompt'}}
-      {{#each currentPrompts as prompt}}
-        <h3>Submissions for {{prompt.fields.slug || `prompt ${humanIndex(prompt.fields.index)}`}}</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>Caller</th>
-              <th>Audio</th>
-              <th>Download</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#each filterByPrompt(searchedSubmissions, prompt.id) as submission}}
-              <tr transition:fly='{y: 200, duration: 1000}'>
-                <td class="timestamp">{{new Date(submission.fields.timestamp).toLocaleString()}}</td>
-                <td class="caller">{{humanPhone(submission.fields.caller)}}</td>
-                <td class="audio">
-                  <span class="soundcite" data-url="{{submission.fields.widget_audio? submission.fields.widget_audio[0].url : submission.fields.audio}}" data-plays="1">
-                    {{#if submission.fields.transcript}}
-                      {{submission.fields.transcript}}
-                    {{else}}
-                      No transcript available.
-                    {{/if}}
-                  </span>
-                </td>
-                <td class="download"><a href="{{submission.fields.audio}}.wav?Download=true">⬇️</a></td>
-              </tr>
-            {{/each}}
-          </tbody>
-        </table>
+    <h3> All submissions <small class="text-muted">Most recent on top</small></h3>
+    <table class="table">
+      <thead>
+        <th scope="col">Timestamp</th>
+        <th scope="col">Prompt</th>
+        <th scope="col">Caller</th>
+        <th scope="col">Transcript</th>
+        <th scope="col">Audio</th>
+      </thead>
+      <tbody>
+      {{#each currentSubmissions as sub}}
+        <tr>
+          <th scope="row">{{new Date(sub.fields.timestamp).toLocaleString()}}</th>
+          <td><Link to="{{`/project/${currentProject.id}/prompt/${sub.fields.prompt[0]}`}}">{{subToPromptName(sub, currentPrompts)}}</Link></td>
+          <td><Link to="{{`/project/${currentProject.id}/caller/${encodeURIComponent(sub.fields.caller)}`}}">{{humanPhone(sub.fields.caller)}}</Link></td>
+          <td>{{sub.fields.transcript || 'No transcript available.'}}</td>
+          <td><audio src="{{sub.fields.widget_audio? sub.fields.widget_audio[0].url : sub.fields.audio}}" controls></audio></td>
+        </tr>
       {{/each}}
-    {{else}}
-      {{#each callers as caller}}
-        <h3>Submissions from {{humanPhone(caller)}}</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>Prompt</th>
-              <th>Audio</th>
-              <th>Download</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#each filterByCaller(searchedSubmissions, caller) as submission}}
-              <tr transition:fly='{y: 200, duration: 1000}'>
-                <td class="timestamp">{{new Date(submission.fields.timestamp).toLocaleString()}}</td>
-                <td class="caller">{{promptIdToSlug(submission.fields.prompt[0], currentPrompts)}}</td>
-                <td class="audio">
-                  <span class="soundcite"  data-url="{{submission.fields.widget_audio? submission.fields.widget_audio[0].url : submission.fields.audio}}"  data-plays="1">
-                    {{#if submission.fields.transcript}}
-                      {{submission.fields.transcript}}
-                    {{else}}
-                      No transcript available.
-                    {{/if}}
-                  </span>
-                </td>
-                <td class="download"><a href="{{submission.fields.audio}}.wav?Download=true">⬇️</a></td>
-              </tr>
-            {{/each}}
-          </tbody>
-        </table>
-      {{/each}}
-    {{/if}}
+      </tbody>
+    </table>
   {{/if}}
 </div>
 
 <style>
-  table {
-    margin: 1em 0;
-    width: 100%;
-    border-collapse: collapse;
+  td:nth-child(4) {
+    min-width: 20em;
   }
 
-  td {
-    border: 1px solid grey;
-    padding: 0.5em;
-  }
-
-  td:first-child {
-    border-left: 0;
-  }
-
-  td:last-child {
-    border-right: 0;
-  }
-
-  .timestamp {
-    min-width: 8em;
-  }
-
-  .caller {
-    min-width: 6em;
-  }
-
-  .audio {
-    max-width: 20em;
-  }
-
-  .download a {
-    text-decoration: none;
-  }
-
-  .soundcite {
-    display: inline-block;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .soundcite:hover {
-    white-space: normal;
+  td:nth-child(5) audio {
+    max-width: 20vw;
   }
 </style>
 
 <script>
-  import { fly } from 'svelte-transitions';
-
-  import initSoundcite from './soundcite';
-  import { humanIndex, humanPhone } from './util';
+  import Link from 'svelte-routing/Link.html';
+  import { humanIndex, humanPhone, subToPromptName } from './util';
 
   export default {
-    oncreate() {
-      this.observe('currentSubmissions', () => {
-        initSoundcite();
-      }, { defer: true });
-      this.observe('organize', () => { // no this sucks TK fix
-        initSoundcite();
-      }, { defer: true });
-    },
+    components: { Link },
     data() {
       return {
         currentProject: null,
         currentPrompts: null,
         currentSubmissions: null,
-        organize: 'prompt',
-        search: '',
       };
     },
-    computed: {
-      projectName: currentProject => (currentProject ? currentProject.fields.name : ''),
-      callers: function callersFunc(currentSubmissions) {
-        if (!currentSubmissions) return null;
-        return Array.from(new Set(currentSubmissions.map(sub => sub.fields.caller)));
-      },
-      searchedSubmissions: function searchFunc(search, currentSubmissions) {
-        if (!search.length) return currentSubmissions;
-        const lowerSearch = search.toLowerCase();
-        return currentSubmissions.filter((sub) => {
-          if (!sub.fields.transcript) return false;
-          return sub.fields.transcript.toLowerCase().includes(lowerSearch);
-        });
-      },
-    },
     helpers: {
-      filterByPrompt: (subs, promptId) =>
-        subs.filter(sub => sub.fields.prompt[0] === promptId),
-      filterByCaller: (subs, caller) =>
-        subs.filter(sub => sub.fields.caller === caller),
+      subToPromptName,
       humanIndex,
       humanPhone,
-      promptIdToSlug: (id, currentPrompts) => {
-        const prompt = currentPrompts.find(p => p.id === id);
-        return prompt.fields.slug || humanIndex(prompt.fields.index);
-      },
     },
-    transitions: { fly },
   };
 </script>

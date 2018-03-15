@@ -41,7 +41,7 @@
   import Link from 'svelte-routing/Link.html';
 
   import Spinner from './Spinner.html';
-  import { humanPhone } from './util';
+  import { humanPhone, subToPromptName } from './util';
 
   export default {
     components: { Link, Spinner },
@@ -73,11 +73,7 @@
     },
     helpers: {
       humanPhone,
-      subToPromptName(sub, currentPrompts) {
-        const promptId = sub.fields.prompt[0];
-        const prompt = currentPrompts.find(p => p.id === promptId);
-        return prompt.fields.slug || `Prompt ${prompt.fields.index + 1}`;
-      },
+      subToPromptName,
     },
   };
 </script>

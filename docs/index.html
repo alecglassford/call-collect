@@ -21,7 +21,7 @@
 <h2 id="gathering-your-keys">Gathering your keys</h2>
 <h3 id="airtable">Airtable</h3>
 <p>Airtable is a product that makes it easy to store data online. It lets you make &quot;bases&quot; which are sort of hybrid databases/spreadsheets, but they also make it easy to store &quot;binary&quot; data (in our case, audio files). This handles much of Call Collect&#39;s data storage needs.</p>
-<p><a href="https://airtable.com/pricing">You can read about their pricing here</a>, but you don&#39;t need a credit card to sign up and you&#39;ll probably be fine with their free plan. We&#39;ll only be storing the audio for your prompts (not the recordings your receive from listeners) in Airtable, so the 2GB of space shouldn&#39;t be a problem, and if you get more than 1,200 records you can upgrade to a paid plan or swap out your key for a new base. (TK information on this)</p>
+<p><a href="https://airtable.com/pricing">You can read about their pricing here</a>, but you don&#39;t need a credit card to sign up and you&#39;ll probably be fine with their free plan. If you get more than 1,200 records or 2GB of attachment space, you can upgrade to a paid plan or swap out your key for a new base</p>
 <p>Here&#39;s what you need to do:</p>
 <ol>
 <li><p>Go to <a href="https://airtable.com/addBaseFromShare/shrNrZaQDNc8VxsKg">this link, which will attempt to clone a template Call Collect &quot;base&quot;</a>. If you don&#39;t have an Airtable account, you&#39;ll be prompted to create one.</p>
@@ -58,7 +58,7 @@
 </ol>
 <h3 id="google-cloud-platform-optional-">Google Cloud Platform (optional)</h3>
 <p>Google&#39;s <a href="https://cloud.google.com/speech/">speech service</a> provides pretty decent audio-to-text transcription affordably. The service currently requires that Call Collect transfers audio from Twilio into Google&#39;s own <a href="https://cloud.google.com/storage/">storage service</a> so we&#39;ll need to enable that too.</p>
-<p>While these services can incur charges, you get a lot of stuff for free every month, and if you&#39;ve never used Google&#39;s &quot;Cloud Platform&quot; before they&#39;ll also give you $300 credit for your first year. So while you&#39;ll need to give a credit card number, you probably won&#39;t have to pay anything for at least a year. (🔥 tip: Many credit cards let you create &quot;virtual&quot; cards via their websites, with limited amounts of money in them. I made one with a $10 limit, so even if I accidentally use these services more than intended, Google won&#39;t be able to charge me much.) (TK more useful pricing info)</p>
+<p>While these services can incur charges (about $0.01 for every 30 seconds of audio transcription), you get a lot of stuff for free every month (e.g. transcription of 60 minutes of audio), and if you&#39;ve never used Google&#39;s &quot;Cloud Platform&quot; before they&#39;ll also give you $300 credit for your first year. So while you&#39;ll need to give a credit card number, you probably won&#39;t have to pay anything for at least a year. (🔥 tip: Many credit cards let you create &quot;virtual&quot; cards via their websites, with limited amounts of money in them. I made one with a $10 limit, so even if I accidentally use these services more than intended, Google won&#39;t be able to charge me much.)</p>
 <p>This one takes a few steps, and you can skip it if you want; your instance of Call Collect just won&#39;t do transcription.</p>
 <p>Here&#39;s what you need to do:</p>
 <ol>

@@ -20,7 +20,7 @@ Ready? Here we go!
 
 Airtable is a product that makes it easy to store data online. It lets you make "bases" which are sort of hybrid databases/spreadsheets, but they also make it easy to store "binary" data (in our case, audio files). This handles much of Call Collect's data storage needs.
 
-[You can read about their pricing here](https://airtable.com/pricing), but you don't need a credit card to sign up and you'll probably be fine with their free plan. We'll only be storing the audio for your prompts (not the recordings your receive from listeners) in Airtable, so the 2GB of space shouldn't be a problem, and if you get more than 1,200 records you can upgrade to a paid plan or swap out your key for a new base. (TK information on this)
+[You can read about their pricing here](https://airtable.com/pricing), but you don't need a credit card to sign up and you'll probably be fine with their free plan. If you get more than 1,200 records or 2GB of attachment space, you can upgrade to a paid plan or swap out your key for a new base
 
 Here's what you need to do:
 
@@ -66,7 +66,7 @@ Here's what you need to do:
 
 Google's [speech service](https://cloud.google.com/speech/) provides pretty decent audio-to-text transcription affordably. The service currently requires that Call Collect transfers audio from Twilio into Google's own [storage service](https://cloud.google.com/storage/) so we'll need to enable that too.
 
-While these services can incur charges, you get a lot of stuff for free every month, and if you've never used Google's "Cloud Platform" before they'll also give you $300 credit for your first year. So while you'll need to give a credit card number, you probably won't have to pay anything for at least a year. (🔥 tip: Many credit cards let you create "virtual" cards via their websites, with limited amounts of money in them. I made one with a $10 limit, so even if I accidentally use these services more than intended, Google won't be able to charge me much.) (TK more useful pricing info)
+While these services can incur charges (about $0.01 for every 30 seconds of audio transcription), you get a lot of stuff for free every month (e.g. transcription of 60 minutes of audio), and if you've never used Google's "Cloud Platform" before they'll also give you $300 credit for your first year. So while you'll need to give a credit card number, you probably won't have to pay anything for at least a year. (🔥 tip: Many credit cards let you create "virtual" cards via their websites, with limited amounts of money in them. I made one with a $10 limit, so even if I accidentally use these services more than intended, Google won't be able to charge me much.)
 
 This one takes a few steps, and you can skip it if you want; your instance of Call Collect just won't do transcription.
 

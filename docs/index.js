@@ -106,7 +106,7 @@ var setEnvAndDeploy = function setEnvAndDeployFunc() {
 
   var googleCredsFile = document.getElementById('google-creds').files[0];
   if (!googleCredsFile) {
-    alert('Please "upload"your Google key file.');
+    alert('Please "upload" your Google key file.');
     return;
   }
   var reader = new FileReader();

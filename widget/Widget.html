@@ -17,7 +17,7 @@
         {{#if !submitting}}
           <div transition:fade>
             {{#if index === 0}}
-              <p>We have {{numActualPrompts}} short prompt{{numAcutalPrompts > 1 ? 's' : ''}} for you to listen and respond to.</p>
+              <p>We have {{numActualPrompts}} short prompt<span>{{numAcutalPrompts > 1 ? 's' : ''}}</span> for you to listen and respond to.</p>
 
               {{#if needContact}}
                 <form id="contact" on:submit="saveContact(event)" transition:fade>

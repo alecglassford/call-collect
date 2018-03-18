@@ -13,18 +13,18 @@ const production = !process.env.ROLLUP_WATCH;
 
 export default [
   { // Rollup the Svelte client
-    input: 'client/main.js',
+    input: 'client/app/main.js',
     output: {
       sourcemap: true,
       format: 'iife',
-      file: 'public/bundle.js',
+      file: 'public/bundle-app.js',
       name: 'app',
     },
     plugins: [
       svelte({
         dev: !production,
         css: (css) => {
-          css.write('public/bundle-svelte.css');
+          css.write('public/bundle-app.css');
         },
         store: true,
         cascade: false,
@@ -36,22 +36,22 @@ export default [
       production && uglify(),
     ],
     watch: {
-      include: 'client/**',
+      include: 'client/app/**',
     },
   },
   { // Rollup the Widget
-    input: 'widget/main.js',
+    input: 'client/widget/main.js',
     output: {
       sourcemap: true,
       format: 'iife',
-      file: 'widget/public/bundle-widget.js',
+      file: 'public/bundle-widget.js',
       name: 'widget',
     },
     plugins: [
       svelte({
         dev: !production,
         css: (css) => {
-          css.write('widget/public/bundle-widget.css');
+          css.write('public/bundle-widget.css');
         },
         store: false,
         cascade: false,
@@ -63,7 +63,7 @@ export default [
       production && uglify(),
     ],
     watch: {
-      include: 'widget/**',
+      include: 'client/widget/**',
     },
   },
   { // Rollup the Express server
@@ -89,15 +89,15 @@ export default [
       sass({
         options: { precision: 6 },
         processor: css => purifycss(
-          ['client/*.html', 'widget/*.html'],
+          ['client/**/*.html'],
           css,
           { minify: production },
         ),
-        output: 'widget/public/bundle-main.css',
+        output: 'public/bundle-main.css',
       }),
     ],
     watch: {
-      include: ['client/**', 'widget/**'],
+      include: 'client/**',
     },
   },
 ];

@@ -23,8 +23,8 @@ const upload = multer({
 });
 
 // Widget/public routes
-app.use(express.static('widget/public'));
-app.get('/widget/:projectId', (req, res) => { res.sendFile(`${__dirname}/widget/index.html`); });
+app.use(express.static('public'));
+app.get('/widget/:projectId', (req, res) => { res.sendFile(`${__dirname}/client/widget/index.html`); });
 app.get('/api/widget/:projectId', widgetData);
 app.post('/api/widget', upload.single('audio'), uploadToWidget);
 app.post('/api/call/:index', express.urlencoded({ extended: true }), handleCall);
@@ -56,7 +56,6 @@ app.use((req, res, next) => {
   }
 });
 
-app.use(express.static('public'));
 app.get('/api/projects', getProjectNames);
 app.get('/api/prompts/:projectName', getPrompts);
 app.put('/api/prompts/:projectName', express.json(), reorderPrompts);
@@ -67,7 +66,7 @@ app.post('/api/prompts', upload.single('promptAudio'), newPrompt);
 // Catch everything else --> /api/... and /widget/... 404, others redirect home
 app.get('/api/*', (req, res) => { res.sendStatus(404); });
 app.get('/widget/*', (req, res) => { res.sendStatus(404); });
-app.get('/*', (req, res) => { res.sendFile(`${__dirname}/public/index.html`); });
+app.get('/*', (req, res) => { res.sendFile(`${__dirname}/client/app/index.html`); });
 
 app.listen(process.env.PORT || 3000, () => {
   console.log('👨‍🏫🎙 I\'m listening.');

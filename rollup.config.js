@@ -76,6 +76,7 @@ export default [
     plugins: [
       resolve(),
       commonjs(),
+      production && replace({ 'process.env.NODE_ENV': '"production"' }),
     ],
     external: id => id in pkg.dependencies || id === 'crypto' || id === 'fs' || id === 'path',
     watch: {
@@ -88,11 +89,7 @@ export default [
     plugins: [
       sass({
         options: { precision: 6 },
-        processor: css => purifycss(
-          ['client/**/*.html'],
-          css,
-          { minify: production },
-        ),
+        processor: css => purifycss(['client/**/*.html'], css, { minify: production }),
         output: 'public/bundle-main.css',
       }),
     ],

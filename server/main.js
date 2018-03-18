@@ -23,7 +23,8 @@ const upload = multer({
 });
 
 // Widget/public routes
-app.use(express.static('public'));
+const maxAge = process.env.NODE_ENV === 'production' ? 1000 * 60 * 60 * 24 * 365 : 0;
+app.use(express.static('public', { maxAge }));
 app.get('/widget/:projectId', (req, res) => { res.sendFile(`${__dirname}/client/widget/index.html`); });
 app.get('/api/widget/:projectId', widgetData);
 app.post('/api/widget', upload.single('audio'), uploadToWidget);

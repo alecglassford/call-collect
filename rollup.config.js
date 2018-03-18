@@ -4,6 +4,8 @@ import commonjs from 'rollup-plugin-commonjs';
 import replace from 'rollup-plugin-replace';
 import buble from 'rollup-plugin-buble';
 import uglify from 'rollup-plugin-uglify';
+import sass from 'rollup-plugin-sass';
+import purifycss from 'purify-css';
 
 import pkg from './package.json';
 
@@ -22,7 +24,7 @@ export default [
       svelte({
         dev: !production,
         css: (css) => {
-          css.write('public/bundle.css');
+          css.write('public/bundle-svelte.css');
         },
         store: true,
         cascade: false,
@@ -78,6 +80,24 @@ export default [
     external: id => id in pkg.dependencies || id === 'crypto' || id === 'fs' || id === 'path',
     watch: {
       include: 'server/**',
+    },
+  },
+  { // Bundle main CSS
+    input: 'client/main.scss',
+    output: { format: 'es', file: '/dev/null' }, // This doesn't matter
+    plugins: [
+      sass({
+        options: { precision: 6 },
+        processor: css => purifycss(
+          ['client/*.html', 'widget/*.html'],
+          css,
+          { minify: production },
+        ),
+        output: 'widget/public/bundle-main.css',
+      }),
+    ],
+    watch: {
+      include: ['client/**', 'widget/**'],
     },
   },
 ];

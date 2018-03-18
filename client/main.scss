@@ -1,0 +1,30 @@
+@import "node_modules/bootstrap/scss/bootstrap";
+
+// messing with bootstrap
+
+// TK: probably a more elegant way to compile these right in, but I don't want
+// Everything "primary" to have the light blue, just these couple of things ...
+
+$cc-blue: #85C1E9;
+.bg-primary {
+  background-color: $cc-blue !important;
+}
+.btn-primary {
+  background-color: $cc-blue;
+  border-color: $cc-blue;
+}
+
+// other
+
+body {
+  min-height: 100vh;
+}
+
+.narrow {
+  max-width: 720px;
+}
+
+@import url('https://fonts.googleapis.com/css?family=Source+Serif+Pro');
+.serif {
+  font-family: "Source Serif Pro", Georgia, serif;
+}

@@ -98,7 +98,7 @@ if (process.env.GOOGLE_CREDS_STRING === undefined) {
           uri: `gs://${bucket.name}/${gcsFilename}`,
         },
       });
-      saveTranscription(prelimResult, submissionId);
+      await saveTranscription(prelimResult, submissionId);
     } catch (err) { // TK improve error handling
       console.error(err);
     }

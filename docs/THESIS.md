@@ -2,8 +2,8 @@
 
 *Enabling any journalist to gather audio from the public*
 
-By [Alec Glassford](mailto:glassford@cs.stanford.edu)
-Advisor: Dan Nguyen
+By [Alec Glassford](mailto:glassford@cs.stanford.edu)\
+Advisor: Dan Nguyen\
 16 March 2018
 
 ## Abstract
